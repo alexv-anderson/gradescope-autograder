@@ -1,0 +1,12 @@
+{
+    "output": [
+        {
+            "requirement": "pattern",
+            "expected": "Welcome to [A-Za-z\\']+ maze\n"
+        },
+        {
+            "requirement": "pattern",
+            "expected": "There are [0-9] exits"
+        }
+    ]
+}
