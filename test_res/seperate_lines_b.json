@@ -1,0 +1,13 @@
+{
+    "output": [
+        {
+            "requirement": "exact",
+            "expected": "What is your favorite number",
+            "endsWithInput": true
+        },
+        {
+            "requirement": "pattern",
+            "expected": "Twice your favorite number is [0-9]+"
+        }
+    ]
+}
