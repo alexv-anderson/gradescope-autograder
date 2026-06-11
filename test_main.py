@@ -79,6 +79,15 @@ class CriterionTest(unittest.TestCase):
         self.assertFalse(res[0])
         self.assertTrue("on line 5" in res[1])
 
+    def test_apply_pattern_with_input_fail(self):
+        criterion = Criterion({
+            "requirement": "pattern",
+            "expected": "Twice your favorite number is [0-9]+"
+        })
+
+        res = criterion.apply(5, "?Twice your favorite number is 32")
+        self.assertFalse(res[0])
+
     def test_consume_exact(self):
         criterion = Criterion({
             "requirement": "exact",
@@ -118,9 +127,9 @@ class CriterionTest(unittest.TestCase):
         self.assertTrue(criterion.is_exhausted())
 
 
-def get_rubric_results(file_name: str) -> Tuple:
+def get_rubric_results(file_name: str, ed=None) -> Tuple:
     rubric = Rubric(f"test_res/{file_name}.json")
-    return rubric.grade(f"test_res/{file_name}.txt")
+    return rubric.grade(f"test_res/{file_name}{ed if ed is not None else ''}.txt")
 
 
 class RubricTest(unittest.TestCase):
@@ -130,8 +139,18 @@ class RubricTest(unittest.TestCase):
         self.assertTrue(results[0], results[1])
         self.assertIsNone(results[1], "Passing tests should not have warning messages")
 
+    def test_separate_lines_with_no_input_fail_pattern(self):
+        results = get_rubric_results("seperate_lines_a", 1)
+
+        self.assertFalse(results[0], results[1])
+
     def test_separate_lines_with_input(self):
         results = get_rubric_results("seperate_lines_b")
 
         self.assertTrue(results[0], results[1])
         self.assertIsNone(results[1], "Passing tests should not have warning messages")
+
+    def test_separate_lines_with_input_fail(self):
+        results = get_rubric_results("seperate_lines_b", 1)
+
+        self.assertFalse(results[0], results[1])

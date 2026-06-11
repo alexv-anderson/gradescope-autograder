@@ -83,8 +83,10 @@ class Rubric:
                     
                     criterion.update()
             
+                    get_next_line = True
                     if criterion.endsWithInput:
                         l = criterion.consume(l)
+                        get_next_line = False
                         print(l)
                     
                     if criterion.is_exhausted():
@@ -92,7 +94,6 @@ class Rubric:
                         criterion = self._load_next_criterion()
                         print(f"\tLoaded: {criterion}")
 
-                    get_next_line = criterion is not None and not criterion.endsWithInput
                     end_of_rubric = criterion is None
 
                     if get_next_line or end_of_rubric:
