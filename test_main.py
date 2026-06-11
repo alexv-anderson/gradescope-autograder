@@ -128,8 +128,8 @@ class CriterionTest(unittest.TestCase):
 
 
 def get_rubric_results(file_name: str, ed=None) -> Tuple:
-    rubric = Rubric(f"test_res/{file_name}.json")
-    return rubric.grade(f"test_res/{file_name}{ed if ed is not None else ''}.txt")
+    rubric = Rubric(f"test_res/rubric/{file_name}.json")
+    return rubric.grade(f"test_res/rubric/{file_name}{ed if ed is not None else ''}.txt")
 
 
 class RubricTest(unittest.TestCase):
