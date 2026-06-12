@@ -118,15 +118,38 @@ def find_match_pattern_index(patterns: list, s: str) -> Optional[int]:
     return None
 
 
+def find_search_pattern_index(patterns: list, s: str) -> Optional[int]:
+    for i, pattern in enumerate(patterns):
+        if re.search(pattern, s):
+            return i
+    return None
+
+
 class FileValidator:
     def __init__(self, fp: str):
         with open(fp, "r") as f:
             data = json.load(f)
         
-        self._files = data["files"]
+        self._files = data["files"] if "files" in data else {}
         self._content = data["content"] if "content" in data else {}
     
     def validate(self, dir_path: str) -> Tuple:
+        res = self._validate_files(dir_path)
+        if not res[0]:
+            return res
+        
+        feedback = []
+        for fn in os.listdir(dir_path):
+            fp = os.path.join(dir_path, fn)
+            feedback += self._validate_file_content(fp)
+        
+        has_feedback = len(feedback) > 0
+        return (
+            not has_feedback,
+            feedback if has_feedback else None
+        )
+    
+    def _validate_files(self, dir_path: str) -> Tuple:
         feedback = []
 
         has_requirements = "required" in self._files
@@ -193,6 +216,25 @@ class FileValidator:
             not has_feedback,
             feedback if has_feedback else None
         )
+
+    def _validate_file_content(self, fp: str) -> list:
+        has_forbidden_patterns = "forbidden" in self._content
+
+        if not has_forbidden_patterns:
+            return []
+        
+        forbidden_patterns = self._content["forbidden"]["patterns"]
+
+        feedback = []
+
+        with open(fp, "r") as f:
+            for i, l in enumerate(f):
+                search_pattern_i = find_search_pattern_index(forbidden_patterns, l)
+                if search_pattern_i is not None:
+                    pattern = forbidden_patterns[search_pattern_i]
+                    feedback.append(f"{pattern} on line {i+1} is not allowed")
+        
+        return feedback
 
 
 if __name__ == "__main__":

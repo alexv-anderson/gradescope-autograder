@@ -54,6 +54,16 @@ class MyTestCase(unittest.TestCase):
             res
         )
     
+    def test_forbidden_content(self):
+        res = get_validator_results("forbidden_content")
+
+        self.assertEqual((True, None), res)
+    
+    def test_forbidden_content_fail(self):
+        res = get_validator_results("forbidden_content_fail")
+
+        self.assertEqual((False, ["ArrayList on line 2 is not allowed"]), res)
+
     def test_allowed_patterns(self):
         res = get_validator_results("allowed_patterns")
 
