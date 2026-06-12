@@ -58,3 +58,11 @@ class MyTestCase(unittest.TestCase):
         res = get_validator_results("allowed_patterns")
 
         self.assertEqual((True, None), res)
+        
+    def test_allowed_patterns_fail(self):
+        res = get_validator_results("allowed_patterns_fail")
+
+        self.assertEqual(
+            (False, ["data.csv is not allowed in the submission"]),
+            res
+        )
