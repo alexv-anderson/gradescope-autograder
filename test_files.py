@@ -19,7 +19,7 @@ def get_validator_results(name: str) -> Tuple:
         return fv.validate(build_submission_dir_path(name))
 
 
-class MyTestCase(unittest.TestCase):
+class FileTest(unittest.TestCase):
     def test_required_name(self):
         res = get_validator_results("required_names")
 
