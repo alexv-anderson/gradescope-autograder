@@ -1,5 +1,6 @@
 
 import json
+import os
 import re
 
 
@@ -72,10 +73,10 @@ class Rubric:
                     if criterion is None:
                         return (False, f"No criterion for '{l}' on line {line_num}")
 
-                    print(f"Line {line_num}: '{l}' -> {criterion}")
+                    # print(f"Line {line_num}: '{l}' -> {criterion}")
 
                     result = criterion.apply(line_num, l)
-                    print(f"\tResult: {result}")
+                    # print(f"\tResult: {result}")
                     if not result[0]:
                         return result
                     
@@ -90,9 +91,9 @@ class Rubric:
                         print(l)
                     
                     if criterion.is_exhausted():
-                        print(f"\tExhausted criterion: {criterion}")
+                        # print(f"\tExhausted criterion: {criterion}")
                         criterion = self._load_next_criterion()
-                        print(f"\tLoaded: {criterion}")
+                        # print(f"\tLoaded: {criterion}")
 
                     end_of_rubric = criterion is None
 
@@ -108,6 +109,66 @@ class Rubric:
         req = self._output.pop(0)
         
         return Criterion(req)
+
+
+class FileValidator:
+    def __init__(self, fp: str):
+        with open(fp, "r") as f:
+            data = json.load(f)
+        
+        self._files = data["files"]
+        self._content = data["content"] if "content" in data else {}
+    
+    def validate(self, dir_path: str) -> Tuple:
+        feedback = []
+
+        for fn in os.listdir(dir_path):
+            if "names" in self._files["required"]:
+                if fn in self._files["required"]["names"]:
+                    self._files["required"]["names"].remove(fn)
+                    continue
+            
+            has_required_patterns = "patterns" in self._files["required"]
+            has_allowed_patterns = "allowed" in self._files
+
+            if not (has_required_patterns or has_allowed_patterns):
+                feedback.append(f"Submission cannot contain file named {fn}")
+                continue
+
+            pattern_match = False
+            if has_required_patterns:
+                for pattern in self._files["required"]["patterns"]:
+                    if re.match(pattern["regex"], fn):
+                        cnt = pattern["count"]
+                        if cnt > 0:
+                            pattern["count"] -= 1
+                            pattern_match = True
+                            continue
+                        else:
+                            feedback.append(f"Too many {pattern['regex']} files")
+                            continue
+            
+            if has_allowed_patterns:
+                for pattern in self._files["allowed"]:
+                    if re.match(pattern, fn):
+                        pattern_match = True
+            
+            if (has_required_patterns or has_allowed_patterns) and not pattern_match:
+                feedback.append(f"{fn} is not allowed in the submission")
+                continue
+            
+            for pattern in self._files["forbidden"]["patterns"]:
+                if fn not in self._files["forbidden"]["exceptions"] and re.match(pattern, fn):
+                    feedback.append(f"{fn} is not allowed in the submission")
+        
+        if "names" in self._files["required"] and len(self._files["required"]["names"]) > 0:
+            feedback.append(f"Submission is missing {self._files["required"]["names"]}")
+        
+        has_feedback = len(feedback) > 0
+        return (
+            not has_feedback,
+            feedback if has_feedback else None
+        )
 
 
 if __name__ == "__main__":
