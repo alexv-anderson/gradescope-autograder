@@ -122,49 +122,57 @@ class FileValidator:
     def validate(self, dir_path: str) -> Tuple:
         feedback = []
 
+        has_requirements = "required" in self._files
+        has_required_names = has_requirements and "names" in self._files["required"]
+        has_required_patterns = has_requirements and "patterns" in self._files["required"]
+        has_allowed_patterns = "allowed" in self._files
+        has_forbidden_patterns = "forbidden" in self._files
+
         print(f"------- {dir_path}")
         for fn in sorted(os.listdir(dir_path)):
             print(f"\t+{fn}")
-            if "names" in self._files["required"]:
-                if fn in self._files["required"]["names"]:
-                    self._files["required"]["names"].remove(fn)
-                    continue
-            
-            has_required_patterns = "patterns" in self._files["required"]
-            has_allowed_patterns = "allowed" in self._files
-
-            if not (has_required_patterns or has_allowed_patterns):
-                feedback.append(f"Submission cannot contain file named {fn}")
-                continue
 
             pattern_match = False
-            if has_required_patterns:
-                for pattern in self._files["required"]["patterns"]:
-                    if re.match(pattern["regex"], fn):
-                        cnt = pattern["count"]
-                        if cnt > 0:
-                            pattern["count"] -= 1
-                        else:
-                            feedback.append(f"Too many {pattern['regex']} files")
-                        pattern_match = True
-                if pattern_match:
+
+            if has_requirements:
+                if "names" in self._files["required"]:
+                    if fn in self._files["required"]["names"]:
+                        self._files["required"]["names"].remove(fn)
+                        continue
+                
+                if not (has_required_patterns or has_allowed_patterns):
+                    feedback.append(f"Submission cannot contain file named {fn}")
                     continue
+
+                if has_required_patterns:
+                    for pattern in self._files["required"]["patterns"]:
+                        if re.match(pattern["regex"], fn):
+                            cnt = pattern["count"]
+                            if cnt > 0:
+                                pattern["count"] -= 1
+                            else:
+                                feedback.append(f"Too many {pattern['regex']} files")
+                            pattern_match = True
+                    if pattern_match:
+                        continue
             
             if has_allowed_patterns:
                 for pattern in self._files["allowed"]:
                     if re.match(pattern, fn):
                         pattern_match = True
+                        continue
             
             print(f"\t({has_required_patterns} {has_allowed_patterns}) {pattern_match}")
             if (has_required_patterns or has_allowed_patterns) and not pattern_match:
                 feedback.append(f"{fn} is not allowed in the submission")
                 continue
             
-            for pattern in self._files["forbidden"]["patterns"]:
-                if fn not in self._files["forbidden"]["exceptions"] and re.match(pattern, fn):
-                    feedback.append(f"{fn} is not allowed in the submission")
+            if has_forbidden_patterns:
+                for pattern in self._files["forbidden"]["patterns"]:
+                    if fn not in self._files["forbidden"]["exceptions"] and re.match(pattern, fn):
+                        feedback.append(f"{fn} is not allowed in the submission")
         
-        if "names" in self._files["required"] and len(self._files["required"]["names"]) > 0:
+        if has_required_names and len(self._files["required"]["names"]) > 0:
             feedback.append(f"Submission is missing {self._files["required"]["names"]}")
         
         has_feedback = len(feedback) > 0

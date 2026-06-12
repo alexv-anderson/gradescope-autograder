@@ -53,3 +53,8 @@ class MyTestCase(unittest.TestCase):
             (False, ["Too many [A-Za-z0-9_]+.md files"]),
             res
         )
+    
+    def test_allowed_patterns(self):
+        res = get_validator_results("allowed_patterns")
+
+        self.assertEqual((True, None), res)
