@@ -45,3 +45,11 @@ class MyTestCase(unittest.TestCase):
             (False, ["App.java is not allowed in the submission"]),
             res
         )
+        
+    def test_required_patterns_too_many(self):
+        res = get_validator_results("required_patterns_too_many")
+
+        self.assertEqual(
+            (False, ["Too many [A-Za-z0-9_]+.md files"]),
+            res
+        )
