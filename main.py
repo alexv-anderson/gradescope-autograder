@@ -111,6 +111,13 @@ class Rubric:
         return Criterion(req)
 
 
+def find_match_pattern_index(patterns: list, s: str) -> Optional[int]:
+    for i, pattern in enumerate(patterns):
+        if re.match(pattern, s):
+            return i
+    return None
+
+
 class FileValidator:
     def __init__(self, fp: str):
         with open(fp, "r") as f:
@@ -129,6 +136,8 @@ class FileValidator:
         has_forbidden_patterns = "forbidden" in self._files
         has_forbidden_patterns_exceptions = has_forbidden_patterns and "exceptions" in self._files["forbidden"]
 
+        required_patterns = [pattern["regex"] for pattern in self._files["required"]["patterns"]] if has_required_patterns else []
+
         print(f"------- {dir_path}")
         for fn in sorted(os.listdir(dir_path)):
             print(f"\t+{fn}")
@@ -146,22 +155,23 @@ class FileValidator:
                     continue
 
                 if has_required_patterns:
-                    for pattern in self._files["required"]["patterns"]:
-                        if re.match(pattern["regex"], fn):
-                            cnt = pattern["count"]
-                            if cnt > 0:
-                                pattern["count"] -= 1
-                            else:
-                                feedback.append(f"Too many {pattern['regex']} files")
-                            pattern_match = True
+                    match_pattern_i = find_match_pattern_index(required_patterns, fn)
+                    if match_pattern_i is not None:
+                        pattern = self._files["required"]["patterns"][match_pattern_i]
+                        cnt = pattern["count"]
+                        if cnt > 0:
+                            pattern["count"] -= 1
+                        else:
+                            feedback.append(f"Too many {pattern['regex']} files")
+                        pattern_match = True
                     if pattern_match:
                         continue
             
             if has_allowed_patterns:
-                for pattern in self._files["allowed"]:
-                    if re.match(pattern, fn):
-                        pattern_match = True
-                        continue
+                match_pattern_i = find_match_pattern_index(self._files["allowed"], fn)
+                if match_pattern_i is not None:
+                    pattern_match = True
+                    continue
             
             print(f"\t({has_required_patterns} {has_allowed_patterns}) {pattern_match}")
             if (has_required_patterns or has_allowed_patterns) and not pattern_match:
@@ -169,11 +179,11 @@ class FileValidator:
                 continue
             
             if has_forbidden_patterns:
-                for pattern in self._files["forbidden"]["patterns"]:
-                    if re.match(pattern, fn):
-                        if has_forbidden_patterns_exceptions and fn in self._files["forbidden"]["exceptions"]:
-                            continue
-                        feedback.append(f"{fn} is not allowed in the submission")
+                match_pattern_i = find_match_pattern_index(self._files["forbidden"]["patterns"], fn)
+                if match_pattern_i is not None:
+                    if has_forbidden_patterns_exceptions and fn in self._files["forbidden"]["exceptions"]:
+                        continue
+                    feedback.append(f"{fn} is not allowed in the submission")
         
         if has_required_names and len(self._files["required"]["names"]) > 0:
             feedback.append(f"Submission is missing {self._files["required"]["names"]}")
