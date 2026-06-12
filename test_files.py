@@ -20,6 +20,11 @@ def get_validator_results(name: str) -> Tuple:
 
 
 class MyTestCase(unittest.TestCase):
+    def test_required_name(self):
+        res = get_validator_results("required_names")
+
+        self.assertEqual((True, None), res)
+
     def test_required_name_missing(self):
         res = get_validator_results("required_names_missing")
 
@@ -27,7 +32,7 @@ class MyTestCase(unittest.TestCase):
             (False, ["Submission cannot contain file named App.java", "Submission is missing ['Main.java']"]),
             res
         )
-    
+
     def test_required_patterns_missing(self):
         res = get_validator_results("required_patterns_missing")
 
