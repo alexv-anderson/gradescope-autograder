@@ -66,3 +66,21 @@ class MyTestCase(unittest.TestCase):
             (False, ["data.csv is not allowed in the submission"]),
             res
         )
+    
+    def test_forbidden_patterns(self):
+        res = get_validator_results("forbidden_patterns")
+
+        self.assertEqual((True, None), res)
+
+    def test_forbidden_patterns_fail(self):
+        res = get_validator_results("forbidden_patterns_fail")
+
+        self.assertEqual(
+            (False, ["data.csv is not allowed in the submission"]),
+            res
+        )
+
+    def test_forbidden_patterns_exceptions(self):
+        res = get_validator_results("forbidden_patterns_exception")
+
+        self.assertEqual((True, None), res)

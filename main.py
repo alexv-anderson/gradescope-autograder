@@ -127,6 +127,7 @@ class FileValidator:
         has_required_patterns = has_requirements and "patterns" in self._files["required"]
         has_allowed_patterns = "allowed" in self._files
         has_forbidden_patterns = "forbidden" in self._files
+        has_forbidden_patterns_exceptions = has_forbidden_patterns and "exceptions" in self._files["forbidden"]
 
         print(f"------- {dir_path}")
         for fn in sorted(os.listdir(dir_path)):
@@ -169,7 +170,9 @@ class FileValidator:
             
             if has_forbidden_patterns:
                 for pattern in self._files["forbidden"]["patterns"]:
-                    if fn not in self._files["forbidden"]["exceptions"] and re.match(pattern, fn):
+                    if re.match(pattern, fn):
+                        if has_forbidden_patterns_exceptions and fn in self._files["forbidden"]["exceptions"]:
+                            continue
                         feedback.append(f"{fn} is not allowed in the submission")
         
         if has_required_names and len(self._files["required"]["names"]) > 0:

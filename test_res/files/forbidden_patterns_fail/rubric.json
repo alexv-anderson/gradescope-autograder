@@ -1,0 +1,9 @@
+{
+    "files": {
+        "forbidden": {
+            "patterns": [
+                "[A-Za-z0-9_]+.csv"
+            ]
+        }
+    }
+}
