@@ -32,6 +32,11 @@ class MyTestCase(unittest.TestCase):
             (False, ["Submission cannot contain file named App.java", "Submission is missing ['Main.java']"]),
             res
         )
+    
+    def test_required_patterns(self):
+        res = get_validator_results("required_patterns")
+
+        self.assertEqual((True, None), res)
 
     def test_required_patterns_missing(self):
         res = get_validator_results("required_patterns_missing")

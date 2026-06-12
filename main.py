@@ -122,7 +122,9 @@ class FileValidator:
     def validate(self, dir_path: str) -> Tuple:
         feedback = []
 
-        for fn in os.listdir(dir_path):
+        print(f"------- {dir_path}")
+        for fn in sorted(os.listdir(dir_path)):
+            print(f"\t+{fn}")
             if "names" in self._files["required"]:
                 if fn in self._files["required"]["names"]:
                     self._files["required"]["names"].remove(fn)
@@ -142,17 +144,18 @@ class FileValidator:
                         cnt = pattern["count"]
                         if cnt > 0:
                             pattern["count"] -= 1
-                            pattern_match = True
-                            continue
                         else:
                             feedback.append(f"Too many {pattern['regex']} files")
-                            continue
+                        pattern_match = True
+                if pattern_match:
+                    continue
             
             if has_allowed_patterns:
                 for pattern in self._files["allowed"]:
                     if re.match(pattern, fn):
                         pattern_match = True
             
+            print(f"\t({has_required_patterns} {has_allowed_patterns}) {pattern_match}")
             if (has_required_patterns or has_allowed_patterns) and not pattern_match:
                 feedback.append(f"{fn} is not allowed in the submission")
                 continue
