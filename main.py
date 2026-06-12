@@ -54,14 +54,14 @@ class Criterion:
         return self._datum["lines"] < 1
     
 
-class Rubric:
+class OutputValidator:
     def __init__(self, fp: str):
         with open(fp, "r") as f:
             data = json.load(f)
         
         self._output = data["output"]
     
-    def grade(self, out_fp: str) -> dict:
+    def grade(self, out_fp: str) -> Tuple:
         print("\n----------------------\n\n")
 
         criterion = self._load_next_criterion()

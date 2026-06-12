@@ -1,7 +1,7 @@
 
 import unittest
 
-from main import Criterion, Rubric
+from main import Criterion, OutputValidator
 
 
 class CriterionTest(unittest.TestCase):
@@ -128,11 +128,11 @@ class CriterionTest(unittest.TestCase):
 
 
 def get_rubric_results(file_name: str, ed=None) -> Tuple:
-    rubric = Rubric(f"test_res/rubric/{file_name}.json")
-    return rubric.grade(f"test_res/rubric/{file_name}{ed if ed is not None else ''}.txt")
+    ov = OutputValidator(f"test_res/rubric/{file_name}.json")
+    return ov.grade(f"test_res/rubric/{file_name}{ed if ed is not None else ''}.txt")
 
 
-class RubricTest(unittest.TestCase):
+class OutputValidatorTest(unittest.TestCase):
     def test_separate_lines_with_no_input(self):
         results = get_rubric_results("seperate_lines_a")
 
