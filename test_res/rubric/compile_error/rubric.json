@@ -1,0 +1,12 @@
+{
+    "files": {
+        "required": {
+            "names": ["Main.java"]
+        }
+    },
+    "compile": {
+        "cmd": ["javac", "Main.java"],
+        "points": 2
+    },
+    "runs": []
+}

@@ -2,6 +2,7 @@
 import json
 import os
 import re
+import subprocess
 
 
 class Criterion:
@@ -236,6 +237,93 @@ class FileValidator:
         
         return feedback
 
+
+def execute(args: list, if_fp=None, dir_path=None) -> Tuple:
+    cwd = os.getcwd()
+    if dir_path is not None:
+        os.chdir(dir_path)
+    
+    print(os.getcwd())
+
+    of_fp = "out.txt"
+    ef_fp = "err.txt"
+    with open(of_fp, "w") as of, open(ef_fp, "w") as ef:
+        if if_fp is None:
+            subprocess.run(args, stdout=of, stderr=ef)
+        else:
+            f = open(if_fp, "r")
+            subprocess.run(args, stdin=f, stdout=of, stderr=ef)
+            f.close()
+    
+    out = get_contets(of_fp)
+    err = get_contets(ef_fp)
+
+    os.remove(of_fp)
+    os.remove(ef_fp)
+
+    if dir_path is not None:
+        os.chdir(cwd)
+
+    return out, err
+
+
+def get_contets(fp: str) -> str:
+    if os.path.getsize(fp) > 0:
+        with open(fp, "r") as f:
+            return f.read()
+
+
+class Rubric:
+    def __init__(self, fp: str):
+        self._fv = FileValidator(fp)
+
+        with open(fp, "r") as f:
+            data = json.load(f)
+
+        self._compile = data["compile"] if "compile" in data else None
+        self._runs = data["runs"]
+
+    def grade(self, submission_dir_path: str) -> dict:
+        res = self._fv.validate(submission_dir_path)
+
+        if not res[0]:
+            return {
+                "score": 0,
+                "output": "\n\n".join(res[1])
+            }
+        
+        if self._compile is not None:
+            out, err = execute(self._compile["cmd"], dir_path=submission_dir_path)
+            if err is not None and len(err) > 0:
+                s_cmd = " ".join(self._compile["cmd"])
+                prefix = f"Compiling with: {s_cmd}\n\n"
+                return {
+                    "tests": [
+                        {
+                            "name": "Compile",
+                            "score": 0,
+                            "max_score": self._compile["points"],
+                            "status": "failed",
+                            "output": prefix + err
+                        }
+                    ]
+                }
+
+        for i, run in enumerate(self._runs):
+            # Run submission and get file path to output
+            out_fp, err_fp = subprocess.run(run["cmd"], run["input"], dir_path=submission_dir_path)
+
+            err = get_contets(err_fp)
+            if err is not None and len(err) > 0:
+                # Fail
+                return err
+
+            ov = OutputValidator(run["criteria"])
+            res = ov.grade(output_fp)
+            if not res[0]:
+                return res
+
+        return True
 
 if __name__ == "__main__":
     rubric = Rubric("output.json")
