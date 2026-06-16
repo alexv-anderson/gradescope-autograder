@@ -57,10 +57,13 @@ class Criterion:
 
 class OutputValidator:
     def __init__(self, fp: str):
-        with open(fp, "r") as f:
-            data = json.load(f)
-        
-        self._output = data["output"]
+        if isinstance(fp, list):
+            self._output = fp
+        else:
+            with open(fp, "r") as f:
+                data = json.load(f)
+            
+            self._output = data["output"]
     
     def grade(self, out_fp: str) -> Tuple:
         print("\n----------------------\n\n")
@@ -245,9 +248,9 @@ def execute(args: list, if_fp=None, dir_path=None) -> Tuple:
     
     print(os.getcwd())
 
-    of_fp = "out.txt"
-    ef_fp = "err.txt"
-    with open(of_fp, "w") as of, open(ef_fp, "w") as ef:
+    of_fn = "out.txt"
+    ef_fn = "err.txt"
+    with open(of_fn, "w") as of, open(ef_fn, "w") as ef:
         if if_fp is None:
             subprocess.run(args, stdout=of, stderr=ef)
         else:
@@ -255,16 +258,13 @@ def execute(args: list, if_fp=None, dir_path=None) -> Tuple:
             subprocess.run(args, stdin=f, stdout=of, stderr=ef)
             f.close()
     
-    out = get_contets(of_fp)
-    err = get_contets(ef_fp)
-
-    os.remove(of_fp)
-    os.remove(ef_fp)
-
     if dir_path is not None:
         os.chdir(cwd)
 
-    return out, err
+    return (
+        of_fn if dir_path is None else os.path.join(dir_path, of_fn),
+        ef_fn if dir_path is None else os.path.join(dir_path, ef_fn)
+    )
 
 
 def get_contets(fp: str) -> str:
@@ -292,11 +292,16 @@ class Rubric:
                 "output": "\n\n".join(res[1])
             }
         
+        tests = []
+        
         if self._compile is not None:
-            out, err = execute(self._compile["cmd"], dir_path=submission_dir_path)
+            out_fp, err_fp = execute(self._compile["cmd"], dir_path=submission_dir_path)
+
+            s_cmd = " ".join(self._compile["cmd"])
+            prefix = f"Compiling with: {s_cmd}"
+
+            err = get_contets(err_fp)
             if err is not None and len(err) > 0:
-                s_cmd = " ".join(self._compile["cmd"])
-                prefix = f"Compiling with: {s_cmd}\n\n"
                 return {
                     "tests": [
                         {
@@ -304,26 +309,61 @@ class Rubric:
                             "score": 0,
                             "max_score": self._compile["points"],
                             "status": "failed",
-                            "output": prefix + err
+                            "output": f"{prefix}\n\n{err}"
                         }
                     ]
                 }
+            else:
+                tests.append({
+                    "name": "Compile",
+                    "score": self._compile["points"],
+                    "max_score": self._compile["points"],
+                    "status": "passed",
+                    "output": prefix
+                })
 
         for i, run in enumerate(self._runs):
             # Run submission and get file path to output
-            out_fp, err_fp = subprocess.run(run["cmd"], run["input"], dir_path=submission_dir_path)
+            if "input" in run:
+                out_fp, err_fp = execute(run["cmd"], run["input"], dir_path=submission_dir_path)
+            else:
+                out_fp, err_fp = execute(run["cmd"], dir_path=submission_dir_path)
+
+            prefix = "Running with: " + " ".join(run["cmd"])
 
             err = get_contets(err_fp)
             if err is not None and len(err) > 0:
-                # Fail
-                return err
+                tests.append({
+                    "name": run["name"],
+                    "score": 0,
+                    "max_score": run["points"],
+                    "status": "failed",
+                    "output": f"{prefix}\n\n{err}"
+                })
+                continue
 
             ov = OutputValidator(run["criteria"])
-            res = ov.grade(output_fp)
+            print("?\t" + out_fp)
+            res = ov.grade(out_fp)
             if not res[0]:
-                return res
+                tests.append({
+                    "name": run["name"],
+                    "score": 0,
+                    "max_score": run["points"],
+                    "status": "failed",
+                    "output": res[1]
+                })
+            else:
+                tests.append({
+                    "name": run["name"],
+                    "score": run["points"],
+                    "max_score": run["points"],
+                    "status": "passed",
+                    "output": "Congratulations!"
+                })
 
-        return True
+        return {"tests": tests}
+
 
 if __name__ == "__main__":
     rubric = Rubric("output.json")
