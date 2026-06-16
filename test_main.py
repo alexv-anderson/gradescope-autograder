@@ -128,8 +128,8 @@ class CriterionTest(unittest.TestCase):
 
 
 def get_rubric_results(file_name: str, ed=None) -> Tuple:
-    ov = OutputValidator(f"test_res/rubric/{file_name}.json")
-    return ov.grade(f"test_res/rubric/{file_name}{ed if ed is not None else ''}.txt")
+    ov = OutputValidator(f"test_res/criterion/{file_name}.json")
+    return ov.grade(f"test_res/criterion/{file_name}{ed if ed is not None else ''}.txt")
 
 
 class OutputValidatorTest(unittest.TestCase):
