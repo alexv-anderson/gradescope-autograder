@@ -3,6 +3,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 
 
 class Criterion:
@@ -365,6 +366,22 @@ class Rubric:
         return {"tests": tests}
 
 
+def grade_submission(rubric_fp: str, submission_dir_path: str, results_fp: str):
+    rubric = Rubric(rubric_fp)
+    results = rubric.grade(submission_dir_path)
+    with open(results_fp, "w+") as f:
+        json.dump(results, f, indent=2)
+
 if __name__ == "__main__":
-    rubric = Rubric("output.json")
-    print(rubric.grade("out.txt"))
+    correct_num = len(sys.argv) == 3
+    correct_files = correct_num and sys.argv[0].endswith(".json") and sys.argv[2].endswith(".json")
+    correct_dir = correct_num and os.isdir(sys.argv[1])
+
+    if correct_num and correct_files and correct_dir:
+        grade_submission(
+            sys.argv[0],    # path to rubric.json
+            sys.argv[1],    # path to submission directory
+            sys.argv[2]     # path to save results
+        )
+    else:
+        print("ERROR: expected three paths as arguments: <rubric.json> <submission_dir> <results.json>")
