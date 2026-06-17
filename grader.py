@@ -17,7 +17,7 @@ class Criterion:
     def __str__(self) -> str:
         return json.dumps(self._datum)
     
-    def apply(self, num: int, l: str) -> Tuple:
+    def apply(self, num: int, l: str) -> tuple:
         msg = None
 
         req = self._datum["requirement"]
@@ -66,7 +66,7 @@ class OutputValidator:
             
             self._output = data["output"]
     
-    def grade(self, out_fp: str) -> Tuple:
+    def grade(self, out_fp: str) -> tuple:
         print("\n----------------------\n\n")
 
         criterion = self._load_next_criterion()
@@ -116,14 +116,14 @@ class OutputValidator:
         return Criterion(req)
 
 
-def find_match_pattern_index(patterns: list, s: str) -> Optional[int]:
+def find_match_pattern_index(patterns: list, s: str) -> int | None:
     for i, pattern in enumerate(patterns):
         if re.match(pattern, s):
             return i
     return None
 
 
-def find_search_pattern_index(patterns: list, s: str) -> Optional[int]:
+def find_search_pattern_index(patterns: list, s: str) -> int | None:
     for i, pattern in enumerate(patterns):
         if re.search(pattern, s):
             return i
@@ -138,7 +138,7 @@ class FileValidator:
         self._files = data["files"] if "files" in data else {}
         self._content = data["content"] if "content" in data else {}
     
-    def validate(self, dir_path: str) -> Tuple:
+    def validate(self, dir_path: str) -> tuple:
         res = self._validate_files(dir_path)
         if not res[0]:
             return res
@@ -154,7 +154,7 @@ class FileValidator:
             feedback if has_feedback else None
         )
     
-    def _validate_files(self, dir_path: str) -> Tuple:
+    def _validate_files(self, dir_path: str) -> tuple:
         feedback = []
 
         has_requirements = "required" in self._files
@@ -214,7 +214,7 @@ class FileValidator:
                     feedback.append(f"{fn} is not allowed in the submission")
         
         if has_required_names and len(self._files["required"]["names"]) > 0:
-            feedback.append(f"Submission is missing {self._files["required"]["names"]}")
+            feedback.append(f"Submission is missing {self._files['required']['names']}")
         
         has_feedback = len(feedback) > 0
         return (
@@ -242,7 +242,7 @@ class FileValidator:
         return feedback
 
 
-def execute(args: list, if_fp=None, dir_path=None) -> Tuple:
+def execute(args: list, if_fp=None, dir_path=None) -> tuple:
     cwd = os.getcwd()
     if dir_path is not None:
         os.chdir(dir_path)
@@ -255,7 +255,7 @@ def execute(args: list, if_fp=None, dir_path=None) -> Tuple:
         if if_fp is None:
             subprocess.run(args, stdout=of, stderr=ef)
         else:
-            f = open(if_fp, "r")
+            f = open(os.path.join(cwd, if_fp), "r")
             subprocess.run(args, stdin=f, stdout=of, stderr=ef)
             f.close()
     
@@ -372,16 +372,18 @@ def grade_submission(rubric_fp: str, submission_dir_path: str, results_fp: str):
     with open(results_fp, "w+") as f:
         json.dump(results, f, indent=2)
 
+
 if __name__ == "__main__":
-    correct_num = len(sys.argv) == 3
-    correct_files = correct_num and sys.argv[0].endswith(".json") and sys.argv[2].endswith(".json")
-    correct_dir = correct_num and os.isdir(sys.argv[1])
+    correct_num = len(sys.argv) == 4
+    correct_files = correct_num and sys.argv[1].endswith(".json") and sys.argv[3].endswith(".json")
+    correct_dir = correct_num and os.path.isdir(sys.argv[2])
 
     if correct_num and correct_files and correct_dir:
         grade_submission(
-            sys.argv[0],    # path to rubric.json
-            sys.argv[1],    # path to submission directory
-            sys.argv[2]     # path to save results
+            sys.argv[1],    # path to rubric.json
+            sys.argv[2],    # path to submission directory
+            sys.argv[3]     # path to save results
         )
     else:
-        print("ERROR: expected three paths as arguments: <rubric.json> <submission_dir> <results.json>")
+        print("ERROR: expected: grader.py <rubric.json> <submission_dir> <results.json>")
+        print(f"\tInstead got {sys.argv}")
