@@ -2,7 +2,7 @@
 import os
 import unittest
 
-from main import Rubric
+from grader import Rubric
 
 
 def load_rubric_results(name: str) -> Rubric:

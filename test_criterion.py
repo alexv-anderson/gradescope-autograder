@@ -1,7 +1,7 @@
 
 import unittest
 
-from main import Criterion, OutputValidator
+from grader import Criterion, OutputValidator
 
 
 class CriterionTest(unittest.TestCase):

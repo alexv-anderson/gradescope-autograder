@@ -2,7 +2,7 @@
 import json
 import unittest
 
-from main import FileValidator
+from grader import FileValidator
 
 
 def build_rubric_file_path(name: str) -> dict:
