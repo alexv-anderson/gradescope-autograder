@@ -1,0 +1,12 @@
+{
+    "content": {
+        "forbidden": {
+            "patterns": [
+                ".*import.*"
+            ],
+            "exceptions": [
+                "import java.util.Scanner;"
+            ]
+        }
+    }
+}

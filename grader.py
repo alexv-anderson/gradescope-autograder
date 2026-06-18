@@ -67,8 +67,6 @@ class OutputValidator:
             self._output = data["output"]
     
     def grade(self, out_fp: str) -> tuple:
-        print("\n----------------------\n\n")
-
         criterion = self._load_next_criterion()
 
         with open(out_fp, "r") as f:
@@ -78,10 +76,8 @@ class OutputValidator:
                     if criterion is None:
                         return (False, f"No criterion for '{l}' on line {line_num}")
 
-                    # print(f"Line {line_num}: '{l}' -> {criterion}")
-
                     result = criterion.apply(line_num, l)
-                    # print(f"\tResult: {result}")
+
                     if not result[0]:
                         return result
                     
@@ -93,12 +89,9 @@ class OutputValidator:
                     if criterion.endsWithInput:
                         l = criterion.consume(l)
                         get_next_line = False
-                        print(l)
                     
                     if criterion.is_exhausted():
-                        # print(f"\tExhausted criterion: {criterion}")
                         criterion = self._load_next_criterion()
-                        # print(f"\tLoaded: {criterion}")
 
                     end_of_rubric = criterion is None
 
@@ -127,6 +120,18 @@ def find_search_pattern_index(patterns: list, s: str) -> int | None:
     for i, pattern in enumerate(patterns):
         if re.search(pattern, s):
             return i
+    return None
+
+
+def found_forbidden_pattern(s: str, forbidden: dict) -> int | None:
+    has_exceptions = "exceptions" in forbidden
+
+    match_pattern_i = find_search_pattern_index(forbidden["patterns"], s)
+    if match_pattern_i is not None:
+        if has_exceptions and find_search_pattern_index(forbidden["exceptions"], s) is not None:
+            return None
+        return match_pattern_i
+    
     return None
 
 
@@ -166,9 +171,7 @@ class FileValidator:
 
         required_patterns = [pattern["regex"] for pattern in self._files["required"]["patterns"]] if has_required_patterns else []
 
-        print(f"------- {dir_path}")
         for fn in sorted(os.listdir(dir_path)):
-            print(f"\t+{fn}")
 
             pattern_match = False
 
@@ -201,16 +204,13 @@ class FileValidator:
                     pattern_match = True
                     continue
             
-            print(f"\t({has_required_patterns} {has_allowed_patterns}) {pattern_match}")
             if (has_required_patterns or has_allowed_patterns) and not pattern_match:
                 feedback.append(f"{fn} is not allowed in the submission")
                 continue
             
             if has_forbidden_patterns:
-                match_pattern_i = find_match_pattern_index(self._files["forbidden"]["patterns"], fn)
+                match_pattern_i = found_forbidden_pattern(fn, self._files["forbidden"])
                 if match_pattern_i is not None:
-                    if has_forbidden_patterns_exceptions and fn in self._files["forbidden"]["exceptions"]:
-                        continue
                     feedback.append(f"{fn} is not allowed in the submission")
         
         if has_required_names and len(self._files["required"]["names"]) > 0:
@@ -234,9 +234,9 @@ class FileValidator:
 
         with open(fp, "r") as f:
             for i, l in enumerate(f):
-                search_pattern_i = find_search_pattern_index(forbidden_patterns, l)
-                if search_pattern_i is not None:
-                    pattern = forbidden_patterns[search_pattern_i]
+                match_pattern_i = found_forbidden_pattern(l, self._content["forbidden"])
+                if match_pattern_i is not None:
+                    pattern = forbidden_patterns[match_pattern_i]
                     feedback.append(f"{pattern} on line {i+1} is not allowed")
         
         return feedback
@@ -247,8 +247,6 @@ def execute(args: list, if_fp=None, dir_path=None) -> tuple:
     if dir_path is not None:
         os.chdir(dir_path)
     
-    print(os.getcwd())
-
     of_fn = "out.txt"
     ef_fn = "err.txt"
     with open(of_fn, "w") as of, open(ef_fn, "w") as ef:
@@ -344,7 +342,7 @@ class Rubric:
                 continue
 
             ov = OutputValidator(run["criteria"])
-            print("?\t" + out_fp)
+            # print("?\t" + out_fp)
             res = ov.grade(out_fp)
             if not res[0]:
                 tests.append({

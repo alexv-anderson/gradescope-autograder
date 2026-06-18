@@ -58,6 +58,11 @@ class FileTest(unittest.TestCase):
         res = get_validator_results("forbidden_content")
 
         self.assertEqual((True, None), res)
+
+    def test_forbidden_content_exception(self):
+        res = get_validator_results("forbidden_content_exception")
+
+        self.assertEqual((True, None), res)
     
     def test_forbidden_content_fail(self):
         res = get_validator_results("forbidden_content_fail")
