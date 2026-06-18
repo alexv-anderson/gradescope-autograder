@@ -73,10 +73,16 @@ class OutputValidator:
             line_num = 1
             for l in f:
                 while True:
+                    print(f"Evaluate {line_num}")
+
                     if criterion is None:
                         return (False, f"No criterion for '{l}' on line {line_num}")
 
                     result = criterion.apply(line_num, l)
+
+                    print(f"\tLine: {l}")
+                    print(f"\tCriterion: {criterion}")
+                    print(f"\tResult: {result}")
 
                     if not result[0]:
                         return result
@@ -92,8 +98,11 @@ class OutputValidator:
                     
                     if criterion.is_exhausted():
                         criterion = self._load_next_criterion()
+                        print("\t...criterion exhausted")
 
                     end_of_rubric = criterion is None
+                    if end_of_rubric:
+                        print("\t...End of rubric")
 
                     if get_next_line or end_of_rubric:
                         break
@@ -342,7 +351,6 @@ class Rubric:
                 continue
 
             ov = OutputValidator(run["criteria"])
-            # print("?\t" + out_fp)
             res = ov.grade(out_fp)
             if not res[0]:
                 tests.append({
