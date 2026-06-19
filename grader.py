@@ -66,49 +66,53 @@ class OutputValidator:
             
             self._output = data["output"]
     
-    def grade(self, out_fp: str) -> tuple:
+    def _gen_out_file_lines(self, out_fp: str):
         criterion = self._load_next_criterion()
 
         with open(out_fp, "r") as f:
             line_num = 1
             for l in f:
                 while True:
-                    print(f"Evaluate {line_num}")
-
-                    if criterion is None:
-                        return (False, f"No criterion for '{l}' on line {line_num}")
-
-                    result = criterion.apply(line_num, l)
-
-                    print(f"\tLine: {l}")
-                    print(f"\tCriterion: {criterion}")
-                    print(f"\tResult: {result}")
-
-                    if not result[0]:
-                        return result
-                    
-                    line_num += 1
-                    
-                    criterion.update()
-            
                     get_next_line = True
                     if criterion.endsWithInput:
-                        l = criterion.consume(l)
                         get_next_line = False
+                        remainder = criterion.consume(l)
+                        line_len = len(l) - len(remainder)
+                        yield (line_num, criterion, l[:line_len])
+                        l = remainder
+                    else:
+                        yield (line_num, criterion, l)
                     
+                    line_num += 1
+
+                    criterion.update()
+
                     if criterion.is_exhausted():
                         criterion = self._load_next_criterion()
-                        print("\t...criterion exhausted")
 
                     end_of_rubric = criterion is None
-                    if end_of_rubric:
-                        print("\t...End of rubric")
 
                     if get_next_line or end_of_rubric:
                         break
+    
+    def grade(self, out_fp: str) -> tuple:
+        for line_num, criterion, l in self._gen_out_file_lines(out_fp):
+            print(f"Evaluate {line_num}")
+
+            if criterion is None:
+                return (False, f"No criterion for '{l}' on line {line_num}")
+            
+            result = criterion.apply(line_num, l)
+
+            print(f"\tLine: {l}")
+            print(f"\tCriterion: {criterion}")
+            print(f"\tResult: {result}")
+
+            if not result[0]:
+                return result
 
         return (True, None)
-    
+
     def _load_next_criterion(self):
         if len(self._output) == 0:
             return None
