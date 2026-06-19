@@ -1,0 +1,6 @@
+{
+    "support": [
+        {"src": "fancy.csv", "dst": "data.csv"}
+    ],
+    "runs": []
+}

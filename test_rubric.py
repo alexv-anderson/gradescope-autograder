@@ -139,3 +139,42 @@ class TestRubric(unittest.TestCase):
             },
             res
         )
+
+    def test_support_no_directory(self):
+        test_dir_path = "test_res/support/no_directory"
+        rubic = Rubric(f"{test_dir_path}/rubric.json")
+
+        cwd = os.getcwd()
+        os.chdir(test_dir_path)
+        res = rubic.grade(f"submission")
+        os.chdir(cwd)
+
+        self.assertEqual({"tests": []}, res)
+        self.assertTrue(os.path.exists(f"{test_dir_path}/submission/data.csv"))
+
+        os.remove(f"{test_dir_path}/submission/data.csv")
+
+    def test_support_no_directory_missing(self):
+        test_dir_path = "test_res/support/no_directory_missing"
+        rubic = Rubric(f"{test_dir_path}/rubric.json")
+
+        cwd = os.getcwd()
+        os.chdir(test_dir_path)
+        res = rubic.grade(f"submission")
+        os.chdir(cwd)
+
+        self.assertEqual({"score": 0, "output": "Submitted files are valid but could not setup supporting files.\nPlease contact course staff/instructor"}, res)
+
+    def test_support_directory(self):
+        test_dir_path = "test_res/support/directory"
+        rubic = Rubric(f"{test_dir_path}/rubric.json")
+
+        cwd = os.getcwd()
+        os.chdir(test_dir_path)
+        res = rubic.grade(f"submission")
+        os.chdir(cwd)
+
+        self.assertEqual({"tests": []}, res)
+        self.assertTrue(os.path.exists(f"{test_dir_path}/submission/data/fancy.csv"))
+
+        os.remove(f"{test_dir_path}/submission/data/fancy.csv")

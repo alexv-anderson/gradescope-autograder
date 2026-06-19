@@ -2,6 +2,7 @@
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 
@@ -324,6 +325,7 @@ class Rubric:
         with open(fp, "r") as f:
             data = json.load(f)
 
+        self._support = data["support"] if "support" in data else []
         self._compile = data["compile"] if "compile" in data else None
         self._runs = data["runs"]
 
@@ -337,6 +339,14 @@ class Rubric:
             }
         
         tests = []
+
+        msg = self._setup_support(submission_dir_path)
+        if msg is not None:
+            print(f"ERROR: Failed to copy support file: {msg}\nWorking directory is {os.getcwd()}")
+            return {
+                "score": 0,
+                "output": "Submitted files are valid but could not setup supporting files.\nPlease contact course staff/instructor"
+            }
         
         if self._compile is not None:
             out_fp, err_fp = execute(self._compile["cmd"], dir_path=submission_dir_path)
@@ -405,6 +415,16 @@ class Rubric:
             tests.append(test)
 
         return {"tests": tests}
+
+    def _setup_support(self, submission_dir_path: str) -> str | None:
+        for file_meta in self._support:
+            dst_fp = os.path.join(submission_dir_path, file_meta["dst"])
+            if os.path.exists(file_meta["src"]):
+                dst_dir_fp = os.path.dirname(dst_fp)
+                os.makedirs(dst_dir_fp, exist_ok=True)
+                shutil.copy(file_meta["src"], dst_fp)
+            else:
+                return str(file_meta)
 
 
 def grade_submission(rubric_fp: str, submission_dir_path: str, results_fp: str):
