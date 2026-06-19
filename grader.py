@@ -75,6 +75,9 @@ class OutputValidator:
             line_num = 1
             for l in f:
                 while True:
+                    if criterion is None:
+                        yield (line_num, criterion, l)
+
                     get_next_line = True
                     if criterion.endsWithInput:
                         get_next_line = False
@@ -92,9 +95,7 @@ class OutputValidator:
                     if criterion.is_exhausted():
                         criterion = self._load_next_criterion()
 
-                    end_of_rubric = criterion is None
-
-                    if get_next_line or end_of_rubric:
+                    if get_next_line:
                         break
     
     def collate_input(self, out_fp: str, in_fp: str) -> str:
@@ -121,7 +122,7 @@ class OutputValidator:
             print(f"Evaluate {line_num}")
 
             if criterion is None:
-                return (False, f"No criterion for '{l}' on line {line_num}")
+                return (False, f"Unexpected output '{l}' at end of program")
             
             result = criterion.apply(line_num, l)
 

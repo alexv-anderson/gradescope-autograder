@@ -154,3 +154,22 @@ class OutputValidatorTest(unittest.TestCase):
         results = get_rubric_results("seperate_lines_b", 1)
 
         self.assertFalse(results[0], results[1])
+
+    def test_too_many_lines_seperate(self):
+        ov = OutputValidator([{
+            "requirement": "exact",
+            "expected": "Hello, world\n"
+        }])
+        res = ov.grade("test_res/criteria/too_many_lines_seperate.txt")
+
+        self.assertEqual((False, f"Unexpected output 'Hello, globe' at end of program"), res)
+
+    def test_too_many_lines_input(self):
+        ov = OutputValidator([{
+            "requirement": "exact",
+            "expected": "Hello, world",
+            "endsWithInput": True
+        }])
+        res = ov.grade("test_res/criteria/too_many_lines_input.txt")
+
+        self.assertEqual((False, f"Unexpected output 'Hello, globe' at end of program"), res)
