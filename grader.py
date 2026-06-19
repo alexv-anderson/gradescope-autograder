@@ -114,7 +114,7 @@ class OutputValidator:
                 if not criterion.apply(line_num, l)[0]:
                     break
         
-        return "\n".join(collated)
+        return "".join(collated)
 
     def grade(self, out_fp: str) -> tuple:
         for line_num, criterion, l in self._gen_out_file_lines(out_fp):
