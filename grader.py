@@ -68,7 +68,7 @@ class OutputValidator:
     
     def _gen_out_file_lines(self, out_fp: str):
         self._init_criteria_iteration()
-        
+
         criterion = self._load_next_criterion()
 
         with open(out_fp, "r") as f:
@@ -97,6 +97,25 @@ class OutputValidator:
                     if get_next_line or end_of_rubric:
                         break
     
+    def collate_input(self, out_fp: str, in_fp: str) -> str:
+        collated = []
+
+        with open(in_fp, "r") as f:
+            in_lines = f.readlines()
+            for line_num, criterion, l in self._gen_out_file_lines(out_fp):
+                if criterion is None:
+                    break
+                
+                if criterion.endsWithInput:
+                    collated.append(l + in_lines.pop(0))
+                else:
+                    collated.append(l)
+                
+                if not criterion.apply(line_num, l)[0]:
+                    break
+        
+        return "\n".join(collated)
+
     def grade(self, out_fp: str) -> tuple:
         for line_num, criterion, l in self._gen_out_file_lines(out_fp):
             print(f"Evaluate {line_num}")
@@ -284,10 +303,17 @@ def execute(args: list, if_fp=None, dir_path=None) -> tuple:
     )
 
 
-def get_contets(fp: str) -> str:
+def get_contents(fp: str) -> str:
     if os.path.getsize(fp) > 0:
         with open(fp, "r") as f:
             return f.read()
+
+
+def build_output(prefix: str, terminal: str, err: str = None) -> str:
+    s = f"{prefix}\n\n--- Terminal ---\n\n{terminal}"
+    if err is not None:
+        s += f"\n\n--- Error ---\n\n{err}"
+    return s
 
 
 class Rubric:
@@ -317,7 +343,7 @@ class Rubric:
             s_cmd = " ".join(self._compile["cmd"])
             prefix = f"Compiling with: {s_cmd}"
 
-            err = get_contets(err_fp)
+            err = get_contents(err_fp)
             if err is not None and len(err) > 0:
                 return {
                     "tests": [
@@ -340,43 +366,42 @@ class Rubric:
                 })
 
         for i, run in enumerate(self._runs):
+            in_fp = run["input"] if "input" in run else None
+
             # Run submission and get file path to output
-            if "input" in run:
+            if in_fp is not None:
                 out_fp, err_fp = execute(run["cmd"], run["input"], dir_path=submission_dir_path)
             else:
                 out_fp, err_fp = execute(run["cmd"], dir_path=submission_dir_path)
 
-            prefix = "Running with: " + " ".join(run["cmd"])
-
-            err = get_contets(err_fp)
-            if err is not None and len(err) > 0:
-                tests.append({
-                    "name": run["name"],
-                    "score": 0,
-                    "max_score": run["points"],
-                    "status": "failed",
-                    "output": f"{prefix}\n\n{err}"
-                })
-                continue
-
             ov = OutputValidator(run["criteria"])
-            res = ov.grade(out_fp)
-            if not res[0]:
-                tests.append({
-                    "name": run["name"],
-                    "score": 0,
-                    "max_score": run["points"],
-                    "status": "failed",
-                    "output": res[1]
-                })
+
+            # Build output
+            prefix = "Running with: " + " ".join(run["cmd"])
+            terminal = ov.collate_input(out_fp, in_fp) if in_fp is not None else get_contents(out_fp)
+            err = get_contents(err_fp)
+            output = build_output(prefix, terminal, err)
+
+            test = {
+                "name": run["name"],
+                "max_score": run["points"],
+                "output": output
+            }
+
+            if err is not None and len(err) > 0:
+                test["score"] = 0
+                test["status"] = "failed"
             else:
-                tests.append({
-                    "name": run["name"],
-                    "score": run["points"],
-                    "max_score": run["points"],
-                    "status": "passed",
-                    "output": "Congratulations!"
-                })
+                res = ov.grade(out_fp)
+                if not res[0]:
+                    test["score"] = 0
+                    test["status"] = "failed"
+                    test["output"] += f"\n\n--- Unexpected Output ---\n\n{res[1]}"
+                else:
+                    test["score"] = run["points"]
+                    test["status"] = "passed"
+
+            tests.append(test)
 
         return {"tests": tests}
 

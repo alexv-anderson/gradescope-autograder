@@ -76,6 +76,8 @@ class TestRubric(unittest.TestCase):
                         "max_score": 5,
                         "status": "failed",
                         "output": "Running with: java Main\n\n" +
+                            "--- Terminal ---\n\nHello, world\n\n\n" +
+                            "--- Error ---\n\n"
                             'Exception in thread "main" java.lang.RuntimeException: Psych\n' +
                             "\tat Main.main(Main.java:5)\n"
                     }
@@ -103,7 +105,9 @@ class TestRubric(unittest.TestCase):
                         "score": 0,
                         "max_score": 5,
                         "status": "failed",
-                        "output": "At line 1 expected 'Hello, world!\n' but got 'Hello, world\n'"
+                        "output": "Running with: java Main\n\n" +
+                                "--- Terminal ---\n\nHello, world\n\n\n" +
+                                "--- Unexpected Output ---\n\nAt line 1 expected 'Hello, world!\n' but got 'Hello, world\n'"
                     }
                 ]
             },
@@ -129,7 +133,7 @@ class TestRubric(unittest.TestCase):
                         "score": 5,
                         "max_score": 5,
                         "status": "passed",
-                        "output": "Congratulations!"
+                        "output": "Running with: java Main\n\n--- Terminal ---\n\nHello, world!\n"
                     }
                 ]
             },
