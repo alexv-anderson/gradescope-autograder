@@ -67,6 +67,8 @@ class OutputValidator:
             self._output = data["output"]
     
     def _gen_out_file_lines(self, out_fp: str):
+        self._init_criteria_iteration()
+        
         criterion = self._load_next_criterion()
 
         with open(out_fp, "r") as f:
@@ -113,13 +115,16 @@ class OutputValidator:
 
         return (True, None)
 
+    def _init_criteria_iteration(self):
+        self._criterion_i = -1
+    
     def _load_next_criterion(self):
-        if len(self._output) == 0:
+        self._criterion_i += 1
+
+        if self._criterion_i >= len(self._output):
             return None
 
-        req = self._output.pop(0)
-        
-        return Criterion(req)
+        return Criterion(self._output[self._criterion_i])
 
 
 def find_match_pattern_index(patterns: list, s: str) -> int | None:
