@@ -178,3 +178,13 @@ class TestRubric(unittest.TestCase):
         self.assertTrue(os.path.exists(f"{test_dir_path}/submission/data/fancy.csv"))
 
         os.remove(f"{test_dir_path}/submission/data/fancy.csv")
+    
+    def test_version_unknown(self):
+        rubric = Rubric("test_res/version/no_version.json")
+
+        self.assertTrue(rubric._rubric_compatible)
+    
+    def test_version_incompatible(self):
+        rubric = Rubric("test_res/version/incompatible.json")
+
+        self.assertFalse(rubric._rubric_compatible)

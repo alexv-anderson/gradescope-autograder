@@ -7,6 +7,9 @@ import subprocess
 import sys
 
 
+_version = [0, 1, 0]
+
+
 class Criterion:
     def __init__(self, d: dict):
         if "lines" not in d:
@@ -325,9 +328,27 @@ class Rubric:
         with open(fp, "r") as f:
             data = json.load(f)
 
-        self._support = data["support"] if "support" in data else []
-        self._compile = data["compile"] if "compile" in data else None
-        self._runs = data["runs"]
+        self._rubric_compatible = True
+        print(f"Grader version: v{'.'.join(list(map(lambda i: str(i), _version)))}")
+        if "version" not in data:
+            print("WARN: Rubric has no version")
+        else:
+            rubric_version = data["version"]
+            print(f"Rubric version: {rubric_version}")
+            rubric_version = rubric_version[1:] if rubric_version.startswith("v") else rubric_version
+            rubric_version = list(map(lambda s: int(s), rubric_version.split(".")))
+            if rubric_version[0] != _version[0] or rubric_version[1] > _version[1]:
+                self._rubric_compatible = False
+                print("\ERROR: Incompatible rubric versions")
+
+        if self._rubric_compatible:
+            self._support = data["support"] if "support" in data else []
+            self._compile = data["compile"] if "compile" in data else None
+            self._runs = data["runs"]
+        else:
+            self._support = []
+            self._compile = None
+            self._runs = []
 
     def grade(self, submission_dir_path: str) -> dict:
         res = self._fv.validate(submission_dir_path)
