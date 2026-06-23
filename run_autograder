@@ -1,21 +1,11 @@
 #!/bin/bash
 
-echo "\t---------------"
-
-echo "ls /autograder/"
-ls /autograder/
-
-echo "\t---------------"
-
-echo "ls /autograder/source/"
-ls /autograder/source/
-
-echo "\t---------------"
+echo "---------------"
 
 echo "ls /autograder/submission/"
 ls /autograder/submission/
 
-echo "\t---------------"
+echo "---------------"
 
 cd /autograder/source
 python3 grader.py rubric.json /autograder/submission /autograder/results/results.json
