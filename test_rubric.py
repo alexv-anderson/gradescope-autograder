@@ -6,8 +6,16 @@ from grader import Rubric
 
 
 def load_rubric_results(name: str) -> Rubric:
-    rubric_path = os.path.join("test_res/rubric", name, "rubric.json")
-    submission_dir_path = os.path.join("test_res/rubric", name, "submission")
+    return load_results("rubric", name)
+
+
+def load_events_results(name: str) -> Rubric:
+    return load_results("events", name)
+
+
+def load_results(dir: str, name: str) -> Rubric:
+    rubric_path = os.path.join("test_res", dir, name, "rubric.json")
+    submission_dir_path = os.path.join("test_res", dir, name, "submission")
 
     rubric = Rubric(rubric_path)
     res = rubric.grade(submission_dir_path)
@@ -188,3 +196,141 @@ class TestRubric(unittest.TestCase):
         rubric = Rubric("test_res/version/incompatible.json")
 
         self.assertFalse(rubric._rubric_compatible)
+
+    def test_event_before_success(self):
+        res = load_events_results("before_success")
+
+        fp = "phrase.txt"
+        self.assertTrue(os.path.exists(fp))
+        os.remove(fp)
+
+        self.maxDiff = None
+        self.assertEqual(
+            {
+                "tests": [
+                    {
+                        "name": "Compile",
+                        "score": 2,
+                        "max_score": 2,
+                        "status": "passed",
+                        "output": "Compiling with: javac Main.java"
+                    },
+                    {
+                        "name": "Greeting",
+                        "score": 5,
+                        "max_score": 5,
+                        "status": "passed",
+                        "output": "Running with: java Main\n\n--- Terminal ---\n\nHello, world!\n"
+                    }
+                ]
+            },
+            res
+        )
+
+    def test_event_before_fail(self):
+        cwd = os.getcwd()
+        os.chdir(f"test_res/events/before_fail")
+
+        rubric = Rubric("rubric.json")
+        res = rubric.grade("submission")
+
+        for fn in ["err.txt", "out.txt", "Main.class"]:
+            os.remove(os.path.join("submission", fn))
+
+        os.chdir(cwd)
+
+        self.maxDiff = None
+        self.assertEqual(
+            {
+                "tests": [
+                    {
+                        "name": "Compile",
+                        "score": 2,
+                        "max_score": 2,
+                        "status": "passed",
+                        "output": "Compiling with: javac Main.java"
+                    },
+                    {
+                        "name": "Greeting",
+                        "score": 0,
+                        "max_score": 5,
+                        "status": "failed",
+                        "output": "Autograder could not setup environment. Please contact course staff/instructor"
+                    }
+                ]
+            },
+            res
+        )
+
+    def test_event_after_success(self):
+        res = load_events_results("after_success")
+
+        fp = "phrase.txt"
+        self.assertTrue(os.path.exists(fp))
+        os.remove(fp)
+
+        self.maxDiff = None
+        self.assertEqual(
+            {
+                "tests": [
+                    {
+                        "name": "Compile",
+                        "score": 2,
+                        "max_score": 2,
+                        "status": "passed",
+                        "output": "Compiling with: javac Main.java"
+                    },
+                    {
+                        "name": "Greeting",
+                        "score": 5,
+                        "max_score": 5,
+                        "status": "passed",
+                        "output": "Running with: java Main\n\n--- Terminal ---\n\nHello, world!\n"
+                    }
+                ]
+            },
+            res
+        )
+
+
+    def test_event_after_fail(self):
+        cwd = os.getcwd()
+        os.chdir(f"test_res/events/after_fail")
+
+        rubric = Rubric("rubric.json")
+        res = rubric.grade("submission")
+
+        for fn in ["err.txt", "out.txt", "Main.class"]:
+            os.remove(os.path.join("submission", fn))
+
+        os.chdir(cwd)
+
+        self.maxDiff = None
+        self.assertEqual(
+            {
+                "tests": [
+                    {
+                        "name": "Compile",
+                        "score": 2,
+                        "max_score": 2,
+                        "status": "passed",
+                        "output": "Compiling with: javac Main.java"
+                    },
+                    {
+                        "name": "Greeting",
+                        "score": 5,
+                        "max_score": 5,
+                        "status": "passed",
+                        "output": "Running with: java Main\n\n--- Terminal ---\n\nHello, world!\n"
+                    },
+                    {
+                        "name": "2nd Greeting",
+                        "score": 0,
+                        "max_score": 5,
+                        "status": "failed",
+                        "output": "Autograder could not setup environment. Please contact course staff/instructor"
+                    }
+                ]
+            },
+            res
+        )

@@ -7,7 +7,7 @@ import subprocess
 import sys
 
 
-_version = [0, 1, 1]
+_version = [0, 2, 0]
 
 
 class Criterion:
@@ -412,8 +412,34 @@ class Rubric:
                     "output": prefix
                 })
 
+        is_env_dirty = False
         for i, run in enumerate(self._runs):
+
+            test = {
+                "name": run["name"],
+                "max_score": run["points"]
+            }
+
+            # Don't run test if a previous test polutted the environment
+            if is_env_dirty:
+                print(f"Can't run {run['name']} because environment is dirty")
+                test["score"] = 0
+                test["status"] = "failed"
+                test["output"] = "Autograder could not setup environment. Please contact course staff/instructor"
+                tests.append(test)
+                continue
+
             in_fp = run["input"] if "input" in run else None
+
+            # Run setup scripts
+            has_event_handers = "events" in run
+            if has_event_handers and "before" in run["events"] and not self._run_scripts(run["events"]["before"]):
+                print(f"Setup script for {run['name']} failed")
+                test["score"] = 0
+                test["status"] = "failed"
+                test["output"] = "Autograder could not setup environment. Please contact course staff/instructor"
+                tests.append(test)
+                continue
 
             # Run submission and get file path to output
             if in_fp is not None:
@@ -429,11 +455,7 @@ class Rubric:
             err = get_contents(err_fp)
             output = build_output(prefix, terminal, err)
 
-            test = {
-                "name": run["name"],
-                "max_score": run["points"],
-                "output": output
-            }
+            test["output"] = output
 
             if err is not None and len(err) > 0:
                 test["score"] = 0
@@ -448,6 +470,10 @@ class Rubric:
                     test["score"] = run["points"]
                     test["status"] = "passed"
 
+            # Run teardown scripts
+            if has_event_handers and "after" in run["events"] and not self._run_scripts(run["events"]["after"]):
+                is_env_dirty = True
+
             tests.append(test)
 
         return {"tests": tests}
@@ -461,6 +487,15 @@ class Rubric:
                 shutil.copy(file_meta["src"], dst_fp)
             else:
                 return str(file_meta)
+
+    def _run_scripts(self, cmds: list) -> bool:
+        for cmd in cmds:
+            cp = subprocess.run(cmd)
+            print(f"{' '.join(cmd)} -> {cp.returncode}")
+            if cp.returncode != 0:
+                print(f"ERROR: command '{' '.join(cmd)}' exited with non-zero returned code: {cp.returncode}")
+                return False
+        return True
 
 
 def grade_submission(rubric_fp: str, submission_dir_path: str, results_fp: str):

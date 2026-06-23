@@ -1,0 +1,29 @@
+{
+    "files": {
+        "required": {
+            "names": ["Main.java"]
+        }
+    },
+    "compile": {
+        "cmd": ["javac", "Main.java"],
+        "points": 2
+    },
+    "runs": [
+        {
+            "name": "Greeting",
+            "events": {
+                "before": [
+                    ["python3", "fail.py"]
+                ]
+            },
+            "cmd": ["java", "Main"],
+            "points": 5,
+            "criteria": [
+                {
+                    "requirement": "exact",
+                    "expected": "Hello, world!\n"
+                }
+            ]
+        }
+    ]
+}
