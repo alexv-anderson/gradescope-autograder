@@ -45,12 +45,23 @@ class Criterion:
         
         return (msg is None, msg)
     
-    def consume(self, l: str) -> str:
-        pattern = self._datum["expected"]
-        if re.match(pattern, l):
-            remain = l[re.search(pattern, l).span()[1]:]
-            if len(remain) > 0:
-                return remain
+    def consume(self, l: str) -> str | None:
+        req = self._datum["requirement"]
+
+        if req == "exact":
+            prefix = self._datum["expected"]
+            if l.startswith(prefix):
+                remain = l[len(prefix):]
+                if len(remain) > 0:
+                    return remain
+
+        elif req == "pattern":
+            pattern = self._datum["expected"]
+            if re.match(pattern, l):
+                remain = l[re.search(pattern, l).span()[1]:]
+                if len(remain) > 0:
+                    return remain
+
         return None
 
     def update(self):
@@ -86,9 +97,13 @@ class OutputValidator:
                     if criterion.endsWithInput:
                         get_next_line = False
                         remainder = criterion.consume(l)
-                        line_len = len(l) - len(remainder)
-                        yield (line_num, criterion, l[:line_len])
-                        l = remainder
+                        if remainder is not None:
+                            line_len = len(l) - len(remainder)
+                            yield (line_num, criterion, l[:line_len])
+                            l = remainder
+                        else:
+                            print(f"{criterion} cannot consume line {line_num}: '{l}'")
+                            (line_num, criterion, l.split("\n")[0] + "\n")
                     else:
                         yield (line_num, criterion, l)
                     

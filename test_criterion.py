@@ -126,6 +126,15 @@ class CriterionTest(unittest.TestCase):
         criterion.update()
         self.assertTrue(criterion.is_exhausted())
 
+    def test_consume_ignore_regex_with_exact(self):
+        criterion = Criterion({
+            "requirement": "exact",
+            "expected": "Try again? (y/n) "
+        })
+
+        remain = criterion.consume("Try again? (y/n) Enter a number: ")
+        self.assertEqual(remain, "Enter a number: ")
+
 
 def get_rubric_results(file_name: str, ed=None) -> Tuple:
     ov = OutputValidator(f"test_res/criterion/{file_name}.json")
