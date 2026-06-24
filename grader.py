@@ -1,13 +1,15 @@
 
 import json
+import logging
 import os
 import re
 import shutil
 import subprocess
 import sys
 
+_version = [0, 2, 1]
 
-_version = [0, 2, 0]
+logger = logging.getLogger(__name__)
 
 
 class Criterion:
@@ -102,7 +104,7 @@ class OutputValidator:
                             yield (line_num, criterion, l[:line_len])
                             l = remainder
                         else:
-                            print(f"{criterion} cannot consume line {line_num}: '{l}'")
+                            logger.debug(f"{criterion} cannot consume line {line_num}: '{l}'")
                             (line_num, criterion, l.split("\n")[0] + "\n")
                     else:
                         yield (line_num, criterion, l)
@@ -138,16 +140,16 @@ class OutputValidator:
 
     def grade(self, out_fp: str) -> tuple:
         for line_num, criterion, l in self._gen_out_file_lines(out_fp):
-            print(f"Evaluate {line_num}")
+            logger.debug(f"Evaluate {line_num}")
 
             if criterion is None:
                 return (False, f"Unexpected output '{l}' at end of program")
             
             result = criterion.apply(line_num, l)
 
-            print(f"\tLine: {l}")
-            print(f"\tCriterion: {criterion}")
-            print(f"\tResult: {result}")
+            logger.debug(f"\tLine: {l}")
+            logger.debug(f"\tCriterion: {criterion}")
+            logger.debug(f"\tResult: {result}")
 
             if not result[0]:
                 return result
@@ -344,17 +346,17 @@ class Rubric:
             data = json.load(f)
 
         self._rubric_compatible = True
-        print(f"Grader version: v{'.'.join(list(map(lambda i: str(i), _version)))}")
+        logger.info(f"Grader version: v{'.'.join(list(map(lambda i: str(i), _version)))}")
         if "version" not in data:
-            print("WARN: Rubric has no version")
+            logger.warning("Rubric has no version")
         else:
             rubric_version = data["version"]
-            print(f"Rubric version: {rubric_version}")
+            logger.info(f"Rubric version: {rubric_version}")
             rubric_version = rubric_version[1:] if rubric_version.startswith("v") else rubric_version
             rubric_version = list(map(lambda s: int(s), rubric_version.split(".")))
             if rubric_version[0] != _version[0] or rubric_version[1] > _version[1]:
                 self._rubric_compatible = False
-                print("\ERROR: Incompatible rubric versions")
+                logger.error("Incompatible rubric version")
 
         if self._rubric_compatible:
             self._support = data["support"] if "support" in data else []
@@ -378,7 +380,7 @@ class Rubric:
 
         msg = self._setup_support(submission_dir_path)
         if msg is not None:
-            print(f"ERROR: Failed to copy support file: {msg}\nWorking directory is {os.getcwd()}")
+            logger.error(f"Failed to copy support file: {msg}\nWorking directory is {os.getcwd()}")
             return {
                 "score": 0,
                 "output": "Submitted files are valid but could not setup supporting files.\nPlease contact course staff/instructor"
@@ -422,7 +424,7 @@ class Rubric:
 
             # Don't run test if a previous test polutted the environment
             if is_env_dirty:
-                print(f"Can't run {run['name']} because environment is dirty")
+                logger.error(f"Can't run {run['name']} because environment is dirty")
                 test["score"] = 0
                 test["status"] = "failed"
                 test["output"] = "Autograder could not setup environment. Please contact course staff/instructor"
@@ -434,7 +436,7 @@ class Rubric:
             # Run setup scripts
             has_event_handers = "events" in run
             if has_event_handers and "before" in run["events"] and not self._run_scripts(run["events"]["before"]):
-                print(f"Setup script for {run['name']} failed")
+                logger.error(f"Setup script for {run['name']} failed")
                 test["score"] = 0
                 test["status"] = "failed"
                 test["output"] = "Autograder could not setup environment. Please contact course staff/instructor"
@@ -491,9 +493,9 @@ class Rubric:
     def _run_scripts(self, cmds: list) -> bool:
         for cmd in cmds:
             cp = subprocess.run(cmd)
-            print(f"{' '.join(cmd)} -> {cp.returncode}")
+            logger.debug(f"{' '.join(cmd)} -> {cp.returncode}")
             if cp.returncode != 0:
-                print(f"ERROR: command '{' '.join(cmd)}' exited with non-zero returned code: {cp.returncode}")
+                logger.error(f"Command '{' '.join(cmd)}' exited with non-zero returned code: {cp.returncode}")
                 return False
         return True
 
@@ -506,6 +508,8 @@ def grade_submission(rubric_fp: str, submission_dir_path: str, results_fp: str):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+
     correct_num = len(sys.argv) == 4
     correct_files = correct_num and sys.argv[1].endswith(".json") and sys.argv[3].endswith(".json")
     correct_dir = correct_num and os.path.isdir(sys.argv[2])
