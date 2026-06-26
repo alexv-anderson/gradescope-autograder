@@ -7,16 +7,24 @@ import shutil
 import subprocess
 import sys
 
-_version = [0, 2, 1]
+_version = [0, 2, 2]
 
 logger = logging.getLogger(__name__)
 
 
 class Criterion:
     def __init__(self, d: dict):
-        if "lines" not in d:
-            d["lines"] = 1
-        self._datum = d
+        self._datum = {}
+
+        expected_keys = set(["requirement", "expected", "lines", "endsWithInput"])
+        for k in d:
+            if k not in expected_keys:
+                logger.warning(f"Unrecogized criterion key {k} in {d}")
+            else:
+                self._datum[k] = d[k]
+
+        if "lines" not in self._datum:
+            self._datum["lines"] = 1
 
         self.endsWithInput = "endsWithInput" in d and d["endsWithInput"]
     
@@ -105,7 +113,7 @@ class OutputValidator:
                             l = remainder
                         else:
                             logger.debug(f"{criterion} cannot consume line {line_num}: '{l}'")
-                            (line_num, criterion, l.split("\n")[0] + "\n")
+                            yield (line_num, criterion, l.split("\n")[0] + "\n")
                     else:
                         yield (line_num, criterion, l)
                     
@@ -123,33 +131,46 @@ class OutputValidator:
         collated = []
 
         with open(in_fp, "r") as f:
+            previous_line_ends_with_input = False
             in_lines = f.readlines()
             for line_num, criterion, l in self._gen_out_file_lines(out_fp):
                 if criterion is None:
                     break
                 
+                if re.match("\\s*\n", l) and previous_line_ends_with_input:
+                    collated.append(f"line {line_num:02d}: {l}")
+                    break
+
                 if criterion.endsWithInput:
-                    collated.append(l + in_lines.pop(0))
+                    collated.append(f"line {line_num:02d}: {l}{in_lines.pop(0)}")
                 else:
-                    collated.append(l)
+                    collated.append(f"line {line_num:02d}: {l}")
                 
+                previous_line_ends_with_input = criterion.endsWithInput
+
                 if not criterion.apply(line_num, l)[0]:
                     break
         
         return "".join(collated)
 
     def grade(self, out_fp: str) -> tuple:
+        previous_line_ends_with_input = False
         for line_num, criterion, l in self._gen_out_file_lines(out_fp):
             logger.debug(f"Evaluate {line_num}")
+
+            logger.debug(f"\t\tLine: {repr(l)}")
+            logger.debug(f"\t\tCriterion: {criterion}")
 
             if criterion is None:
                 return (False, f"Unexpected output '{l}' at end of program")
             
-            result = criterion.apply(line_num, l)
+            if re.match("\\s*\n", l) and previous_line_ends_with_input:
+                return (False, f"Line {line_num} was empty because input was supposed to be collected on line {line_num-1}.")
 
-            logger.debug(f"\tLine: {l}")
-            logger.debug(f"\tCriterion: {criterion}")
-            logger.debug(f"\tResult: {result}")
+            result = criterion.apply(line_num, l)
+            previous_line_ends_with_input = criterion.endsWithInput
+
+            logger.debug(f"\t\tResult: {result}")
 
             if not result[0]:
                 return result

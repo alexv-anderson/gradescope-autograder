@@ -1,4 +1,5 @@
 
+import logging
 import unittest
 
 from grader import Criterion, OutputValidator
@@ -182,3 +183,35 @@ class OutputValidatorTest(unittest.TestCase):
         res = ov.grade("test_res/criteria/too_many_lines_input.txt")
 
         self.assertEqual((False, f"Unexpected output 'Hello, globe' at end of program"), res)
+
+    def test_missing_input(self):
+        ov = OutputValidator([
+            {
+                "requirement": "exact",
+                "expected": "What is your favorite number:",
+                "endsWithInput": True
+            },
+            {
+                "requirement": "exact",
+                "expected": "That is a nice number."
+            }
+        ])
+        res = ov.grade("test_res/criteria/test_missing_input.txt")
+
+        self.assertEqual((False, "Line 2 was empty because input was supposed to be collected on line 1."), res)
+
+    def test_missing_input_ignore(self):
+        ov = OutputValidator([
+            {
+                "requirement": "exact",
+                "expected": "What is your favorite number:",
+                "endsWithInput": True
+            },
+            {
+                "requirement": "ignore",
+                "lines": 1
+            }
+        ])
+        res = ov.grade("test_res/criteria/test_missing_input.txt")
+
+        self.assertEqual((False, "Line 2 was empty because input was supposed to be collected on line 1."), res)
