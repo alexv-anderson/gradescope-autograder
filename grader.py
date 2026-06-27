@@ -7,7 +7,7 @@ import shutil
 import subprocess
 import sys
 
-_version = [0, 2, 2]
+_version = [0, 2, 3]
 
 logger = logging.getLogger(__name__)
 
@@ -61,16 +61,12 @@ class Criterion:
         if req == "exact":
             prefix = self._datum["expected"]
             if l.startswith(prefix):
-                remain = l[len(prefix):]
-                if len(remain) > 0:
-                    return remain
+                return l[len(prefix):]
 
         elif req == "pattern":
             pattern = self._datum["expected"]
             if re.match(pattern, l):
-                remain = l[re.search(pattern, l).span()[1]:]
-                if len(remain) > 0:
-                    return remain
+                return l[re.search(pattern, l).span()[1]:]
 
         return None
 
@@ -124,7 +120,7 @@ class OutputValidator:
                     if criterion.is_exhausted():
                         criterion = self._load_next_criterion()
 
-                    if get_next_line:
+                    if get_next_line or len(l) == 0:
                         break
     
     def collate_input(self, out_fp: str, in_fp: str) -> str:

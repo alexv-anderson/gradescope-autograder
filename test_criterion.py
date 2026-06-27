@@ -99,7 +99,7 @@ class CriterionTest(unittest.TestCase):
         self.assertEqual("!", remain)
 
         remain = criterion.consume("Hello, world")
-        self.assertIsNone(remain)
+        self.assertEqual("", remain)
 
     def test_consume_pattern(self):
         criterion = Criterion({
@@ -111,7 +111,7 @@ class CriterionTest(unittest.TestCase):
         self.assertEqual("!", remain)
 
         remain = criterion.consume("Hello, world")
-        self.assertIsNone(remain)
+        self.assertEqual("", remain)
 
     def test_update_exhausted(self):
         criterion = Criterion({"lines": 2})
