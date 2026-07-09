@@ -55,8 +55,42 @@
 
                 // Row
 
-                let table = document.getElementById("runTbl");
+                let table = document.getElementById("runTblBdy");
                 table.appendChild(row)
+            }
+
+            function saveRun() {
+                let tbl = document.getElementById("runTblBdy");
+
+                let run = {
+                    criteria: []
+                };
+
+                console.log(tbl.children);
+
+                for (let row of tbl.children) {
+                    let criterion = {};
+
+                    let i = 0;
+                    for (let datum of row.children) {
+                        let tag = datum.children[0];
+                        if (i === 0) {
+                            criterion.requirement = tag.value;
+                        } else if (i === 1) {
+                            criterion.expected = tag.value;
+                        } else if (i == 2) {
+                            criterion.endsWithInput = tag.checked;
+                        } else {
+                            window.alert("Too many columns in criteria table");
+                        }
+
+                        i++;
+                    }
+
+                    run.criteria.push(criterion);
+                }
+
+                console.log(run);
             }
 
             window.addEventListener("load", function () {
@@ -111,27 +145,31 @@
         </section>
         <section id="runs">
             <button id="newRunBtn">New Run</button>
-            <button id="newRunBtn">Save Run</button>
+            <button id="saveRunBtn" onclick="saveRun()">Save Run</button>
             <select id="runSlt">
 
             </select>
             <table id="runTbl" class="w3-table">
-                <tr>
-                    <th>Requirement</th>
-                    <th>Expected</th>
-                    <th>Ends with Input?</th>
-                </tr>
-                <tr>
-                    <td>
-                        <select>
-                            <option value="exact">Exact</option>
-                            <option value="pattern">Regular Expression</option>
-                            <option value="ignore">Ignore</option>
-                        </select>
-                    </td>
-                    <td><input type="text" /></td>
-                    <td><input type="checkbox" /></td>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>Requirement</th>
+                        <th>Expected</th>
+                        <th>Ends with Input?</th>
+                    </tr>
+                </thead>
+                <tbody id="runTblBdy">
+                    <tr>
+                        <td>
+                            <select>
+                                <option value="exact">Exact</option>
+                                <option value="pattern">Regular Expression</option>
+                                <option value="ignore">Ignore</option>
+                            </select>
+                        </td>
+                        <td><input type="text" /></td>
+                        <td><input type="checkbox" /></td>
+                    </tr>
+                </tbody>
             </table>
             <button onclick="addLine()">+ Add Line</button>
         </section>
