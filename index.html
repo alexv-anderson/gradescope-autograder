@@ -4,6 +4,54 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+
+        <script>
+            /**
+             * Extract data from DOM
+             */
+
+            function extractRun() {
+                let tbl = document.getElementById("runTblBdy");
+
+                return {
+                    criteria: extractCriteria(tbl)
+                };
+            }
+
+            function extractCriteria(tbl) {
+                let criteria = [];
+
+                for (let row of tbl.children) {
+                    let criterion = extractCriterionFromRow(row);
+
+                    criteria.push(criterion);
+                }
+
+                return criteria;
+            }
+
+            function extractCriterionFromRow(row) {
+                let criterion = {};
+
+                let i = 0;
+                for (let datum of row.children) {
+                    let tag = datum.children[0];
+                    if (i === 0) {
+                        criterion.requirement = tag.value;
+                    } else if (i === 1) {
+                        criterion.expected = tag.value;
+                    } else if (i == 2) {
+                        criterion.endsWithInput = tag.checked;
+                    } else {
+                        window.alert("Too many columns in criteria table");
+                    }
+
+                    i++;
+                }
+
+                return criterion;
+            }
+        </script>
         <script>
             let files = {};
             let content = {};
@@ -60,37 +108,7 @@
             }
 
             function saveRun() {
-                let tbl = document.getElementById("runTblBdy");
-
-                let run = {
-                    criteria: []
-                };
-
-                console.log(tbl.children);
-
-                for (let row of tbl.children) {
-                    let criterion = {};
-
-                    let i = 0;
-                    for (let datum of row.children) {
-                        let tag = datum.children[0];
-                        if (i === 0) {
-                            criterion.requirement = tag.value;
-                        } else if (i === 1) {
-                            criterion.expected = tag.value;
-                        } else if (i == 2) {
-                            criterion.endsWithInput = tag.checked;
-                        } else {
-                            window.alert("Too many columns in criteria table");
-                        }
-
-                        i++;
-                    }
-
-                    run.criteria.push(criterion);
-                }
-
-                console.log(run);
+                console.log(extractRun())
             }
 
             window.addEventListener("load", function () {
