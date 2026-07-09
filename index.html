@@ -61,7 +61,7 @@
             let files = {};
             let content = {};
             let compile = {};
-            let runs = [];
+            let runs = {};
 
             function addLine() {
                 let row = document.createElement("tr");
@@ -113,7 +113,10 @@
             }
 
             function saveRun() {
-                console.log(extractRun())
+                let run = extractRun()
+                runs[run.name] = run;
+
+                console.log(runs);
             }
 
             window.addEventListener("load", function () {
