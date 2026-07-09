@@ -14,8 +14,13 @@
                 let tbl = document.getElementById("runTblBdy");
 
                 return {
+                    name: extractName(),
                     criteria: extractCriteria(tbl)
                 };
+            }
+
+            function extractName() {
+                return document.getElementById("runName").value
             }
 
             function extractCriteria(tbl) {
@@ -162,11 +167,14 @@
             
         </section>
         <section id="runs">
-            <button id="newRunBtn">New Run</button>
-            <button id="saveRunBtn" onclick="saveRun()">Save Run</button>
-            <select id="runSlt">
+            <button id="newRunBtn">New Run</button><br/>
 
-            </select>
+            <select id="runSlt"></select>
+            <button id="loadRunBtn">Load Run</button><br/>
+
+            <input id="runName" type="text" />
+            <button id="saveRunBtn" onclick="saveRun()">Save Run</button>
+
             <table id="runTbl" class="w3-table">
                 <thead>
                     <tr>
