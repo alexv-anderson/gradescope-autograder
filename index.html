@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+        <script>
+            let files = {};
+            let content = {};
+            let compile = {};
+            let runs = [];
+
+            function addLine() {
+                let row = document.createElement("tr");
+
+                // Select
+                let select = document.createElement("select");
+
+                let opt = document.createElement("option");
+                opt.value = "exact";
+                opt.innerHTML = "Exact";
+                select.appendChild(opt);
+
+                opt = document.createElement("option");
+                opt.value = "pattern";
+                opt.innerHTML = "Regular Expression";
+                select.appendChild(opt);
+
+                opt = document.createElement("option");
+                opt.value = "ignore";
+                opt.innerHTML = "Ignore";
+                select.appendChild(opt);
+
+                let td = document.createElement("td");
+                td.appendChild(select);
+                row.appendChild(td);
+
+                // Expected
+
+                let input = document.createElement("input");
+                input.type = "text";
+
+                td = document.createElement("td");
+                td.appendChild(input);
+                row.appendChild(td);
+
+                // Input
+
+                input = document.createElement("input");
+                input.type = "checkbox";
+
+                td = document.createElement("td");
+                td.appendChild(input);
+                row.appendChild(td);
+
+                // Row
+
+                let table = document.getElementById("runTbl");
+                table.appendChild(row)
+            }
+
+            window.addEventListener("load", function () {
+                // Save
+                document.getElementById("saveBtn").addEventListener("click", function() {
+                    let rubric = {
+                        files: files,
+                        content: content,
+                        compile: compile,
+                        runs: runs
+                    };
+
+                    // From: https://web.dev/patterns/files/save-a-file
+                    let downloadLink = document.createElement("a");
+
+                    let url = URL.createObjectURL(
+                        // From: https://robkendal.co.uk/blog/2020-04-17-saving-text-to-client-side-file-using-vanilla-js/
+                        new Blob([JSON.stringify(rubric)], {type: "text/plain"})
+                    );
+                    downloadLink.href = url
+                    downloadLink.download = "rubric.json";
+                    downloadLink.style.display = "none";
+
+                    document.body.append(downloadLink);
+
+                    downloadLink.click();
+
+                    setTimeout(
+                        function() {
+                            URL.revokeObjectURL(url);
+                            downloadLink.remove();
+                        },
+                        1000
+                    );
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <nav>
+            <button id="saveBtn">Save to Downloads</button>
+            <!-- TODO: File Picker -->
+        </nav>
+        <section id="files">
+
+        </section>
+        <section id="content">
+            
+        </section>
+        <section id="compile">
+            
+        </section>
+        <section id="runs">
+            <button id="newRunBtn">New Run</button>
+            <button id="newRunBtn">Save Run</button>
+            <select id="runSlt">
+
+            </select>
+            <table id="runTbl" class="w3-table">
+                <tr>
+                    <th>Requirement</th>
+                    <th>Expected</th>
+                    <th>Ends with Input?</th>
+                </tr>
+                <tr>
+                    <td>
+                        <select>
+                            <option value="exact">Exact</option>
+                            <option value="pattern">Regular Expression</option>
+                            <option value="ignore">Ignore</option>
+                        </select>
+                    </td>
+                    <td><input type="text" /></td>
+                    <td><input type="checkbox" /></td>
+                </tr>
+            </table>
+            <button onclick="addLine()">+ Add Line</button>
+        </section>
+    </body>
+</html>
