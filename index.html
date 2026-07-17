@@ -203,6 +203,24 @@
                 hideAllSections();
                 document.getElementById("runs").style.display = "block";
             }
+
+            function addRun() {
+                // Empty and show run name field
+                let runNameInput = document.getElementById("runName");
+                runNameInput.value = "";
+                runNameInput.hidden = false;
+
+                // Clear run table and add empty row
+                let runTblBdy = document.getElementById("runTblBdy");
+                while (runTblBdy.firstChild) {
+                    runTblBdy.removeChild(runTblBdy.firstChild);
+                }
+
+                addLine();
+
+                // Update UI
+                showRunEditor();
+            }
         </script>
         <script>
             let files = {};
@@ -343,7 +361,7 @@
             <button>Compile</button><br/>
             Run <select id="runSlt"></select>
             <button id="loadRunBtn" onclick="loadRun()">Load</button><br/>
-            <button>Add Run</button><br/>
+            <button onclick="addRun()">Add Run</button><br/>
             <button id="saveBtn">Save to Downloads</button>
         </nav>
         <div style="margin-left: 25%">
