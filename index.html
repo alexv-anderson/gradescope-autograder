@@ -152,6 +152,27 @@
                         1000
                     );
                 });
+
+                // Load (Google AI Code)
+                document.getElementById("filePicker").addEventListener("change", function(event) {
+                    let file = event.target.files[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+
+                    // Triggered when file reading finishes successfully
+                    reader.onload = (e) => {
+                        const fileContent = e.target.result;
+                        console.log("Raw File Content:", fileContent);
+                        // You can now pass fileContent to your custom parser logic
+                    };
+
+                    // Triggered if an error occurs during reading
+                    reader.onerror = () => console.error("Error reading file.");
+
+                    // Read the file structure as a plain text string
+                    reader.readAsText(file);
+                });
             });
         </script>
     </head>
@@ -159,6 +180,7 @@
         <nav>
             <button id="saveBtn">Save to Downloads</button>
             <!-- TODO: File Picker -->
+            <input id="filePicker" type="file" accept=".json" />
         </nav>
         <section id="files">
 
