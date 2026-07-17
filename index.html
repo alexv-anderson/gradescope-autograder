@@ -146,6 +146,7 @@
                 }
             }
 
+            //#region Inflating run table
             function buildRequirementSelect(criterion) {
                 let select = document.createElement("select");
                 select.appendChild(buildOption("exact", "Exact"));
@@ -180,6 +181,7 @@
                 }
                 return checkbox;
             }
+            //#endregion
         </script>
         <script>
             let files = {};
@@ -311,51 +313,53 @@
         </script>
     </head>
     <body>
-        <nav>
+        <nav class="w3-sidebar w3-bar-block" style="width: 25%">
             <button id="saveBtn">Save to Downloads</button>
             <input id="filePicker" type="file" accept=".json" />
         </nav>
-        <section id="files">
+        <div style="margin-left: 25%">
+            <section id="files">
 
-        </section>
-        <section id="content">
-            
-        </section>
-        <section id="compile">
-            
-        </section>
-        <section id="runs">
-            <button id="newRunBtn">New Run</button><br/>
+            </section>
+            <section id="content">
 
-            <select id="runSlt"></select>
-            <button id="loadRunBtn" onclick="loadRun()">Load Run</button><br/>
+            </section>
+            <section id="compile">
 
-            <input id="runName" type="text" />
-            <button id="saveRunBtn" onclick="saveRun()">Save Run</button>
+            </section>
+            <section id="runs" class="w3-container">
+                <button id="newRunBtn">New Run</button><br/>
 
-            <table id="runTbl" class="w3-table">
-                <thead>
-                    <tr>
-                        <th>Requirement</th>
-                        <th>Expected</th>
-                        <th>Ends with Input?</th>
-                    </tr>
-                </thead>
-                <tbody id="runTblBdy">
-                    <tr>
-                        <td>
-                            <select>
-                                <option value="exact">Exact</option>
-                                <option value="pattern">Regular Expression</option>
-                                <option value="ignore">Ignore</option>
-                            </select>
-                        </td>
-                        <td><input type="text" /></td>
-                        <td><input type="checkbox" /></td>
-                    </tr>
-                </tbody>
-            </table>
-            <button onclick="addLine()">+ Add Line</button>
-        </section>
+                <select id="runSlt"></select>
+                <button id="loadRunBtn" onclick="loadRun()">Load Run</button><br/>
+
+                <input id="runName" type="text" />
+                <button id="saveRunBtn" class="w3-btn w3-green" onclick="saveRun()">Save Run</button>
+
+                <table id="runTbl" class="w3-table">
+                    <thead>
+                        <tr>
+                            <th>Requirement</th>
+                            <th>Expected</th>
+                            <th>Ends with Input?</th>
+                        </tr>
+                    </thead>
+                    <tbody id="runTblBdy">
+                        <tr>
+                            <td>
+                                <select>
+                                    <option value="exact">Exact</option>
+                                    <option value="pattern">Regular Expression</option>
+                                    <option value="ignore">Ignore</option>
+                                </select>
+                            </td>
+                            <td><input type="text" /></td>
+                            <td><input type="checkbox" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <button onclick="addLine()">+ Add Line</button>
+            </section>
+        </div>
     </body>
 </html>
