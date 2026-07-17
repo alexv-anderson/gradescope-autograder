@@ -126,8 +126,14 @@
                         files: files,
                         content: content,
                         compile: compile,
-                        runs: runs
+                        runs: []
                     };
+
+                    for (let name in runs) {
+                        let run = runs[name];
+                        run.name = name;
+                        rubric.runs.append(run)
+                    }
 
                     // From: https://web.dev/patterns/files/save-a-file
                     let downloadLink = document.createElement("a");
