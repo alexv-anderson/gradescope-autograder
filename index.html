@@ -184,6 +184,23 @@
             //#endregion
         </script>
         <script>
+            /**
+             * User DOM Manipulation
+             */
+
+            function hideAllSections() {
+                for (let id of ["files", "content", "compile", "runs"]) {
+                    let section = document.getElementById(id);
+                    section.style.display = "none";
+                }
+            }
+
+            function showRunEditor() {
+                hideAllSections();
+                document.getElementById("runs").style.display = "block";
+            }
+        </script>
+        <script>
             let files = {};
             let content = {};
             let compile = {};
@@ -309,30 +326,33 @@
                     // Read the file structure as a plain text string
                     reader.readAsText(file);
                 });
+
+                showRunEditor();
             });
         </script>
     </head>
     <body>
         <nav class="w3-sidebar w3-bar-block" style="width: 25%">
+            <input id="filePicker" type="file" accept=".json" /><br/>
+            <button>Files</button><br/>
+            <button>Content</button><br/>
+            <button>Compile</button><br/>
+            Run <select id="runSlt"></select>
+            <button id="loadRunBtn" onclick="loadRun()">Load</button><br/>
+            <button>Add Run</button><br/>
             <button id="saveBtn">Save to Downloads</button>
-            <input id="filePicker" type="file" accept=".json" />
         </nav>
         <div style="margin-left: 25%">
-            <section id="files">
-
+            <section id="files" class="w3-container">
+                File Requirements
             </section>
-            <section id="content">
-
+            <section id="content" class="w3-container">
+                File Content Requirements
             </section>
-            <section id="compile">
-
+            <section id="compile" class="w3-container">
+                File Compile Requirements
             </section>
-            <section id="runs" class="w3-container">
-                <button id="newRunBtn">New Run</button><br/>
-
-                <select id="runSlt"></select>
-                <button id="loadRunBtn" onclick="loadRun()">Load Run</button><br/>
-
+            <section id="runs" >
                 <input id="runName" type="text" />
                 <button id="saveRunBtn" class="w3-btn w3-green" onclick="saveRun()">Save Run</button>
 
