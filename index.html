@@ -114,9 +114,13 @@
 
             function saveRun() {
                 let run = extractRun()
-                runs[run.name] = run;
+                if (run.name.trim().length > 0) {
+                    runs[run.name] = run;
 
-                console.log(runs);
+                    console.log(runs);
+                } else {
+                    window.alert("Cannot save run because the name is blank");
+                }
             }
 
             window.addEventListener("load", function () {
