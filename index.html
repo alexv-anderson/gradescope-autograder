@@ -124,6 +124,10 @@
                     tblBdy.removeChild(tblBdy.firstChild);
                 }
 
+                let runNameInput = document.getElementById("runName");
+                runNameInput.value = runName;
+                runNameInput.hidden = true;
+
                 for (let criterion of runs[runName].criteria) {
                     let row = document.createElement("tr");
 
