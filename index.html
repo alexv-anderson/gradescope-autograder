@@ -58,6 +58,130 @@
             }
         </script>
         <script>
+            /**
+             * DOM Manipulation
+             */
+
+            function parseRubric(text) {
+                let rubric = JSON.parse(text);
+
+                runs = {};
+                for (let run of rubric.runs) {
+                    runs[run.name] = run;
+                }
+
+                refreshRunSelectOptions();
+                loadRun();
+            }
+
+            function refreshRunSelectOptions() {
+                let select = document.getElementById("runSlt");
+
+                let selectedValue = null;
+                while (select.firstChild) {
+                    if (select.firstChild.selected) {
+                        selectedValue = select.firstChild.value;
+                    }
+
+                    select.removeChild(select.firstChild);
+                }
+
+                let names = [];
+                for (let name in runs) {
+                    names.push(name);
+                }
+
+                console.log(selectedValue);
+                for (let name of names.sort()) {
+                    let option = document.createElement("option");
+                    option.innerHTML = name;
+                    option.value = name;
+                    if (selectedValue === null) {
+                        option.selected = true;
+                        selectedValue = name;
+                    }
+                    select.appendChild(option);
+                }
+                console.log(selectedValue);
+
+                select.value = selectedValue;
+            }
+
+            function loadRun() {
+                let runName = document.getElementById("runSlt").value;
+                if (!runName) {
+                    window.alert("Error: No run name");
+                    return;
+                }
+
+                if (runs[runName] === undefined) {
+                    window.alert("No run named " + runName);
+                    return;
+                }
+
+                let tblBdy = document.getElementById("runTblBdy");
+                while (tblBdy.firstChild) {
+                    tblBdy.removeChild(tblBdy.firstChild);
+                }
+
+                for (let criterion of runs[runName].criteria) {
+                    let row = document.createElement("tr");
+
+                    // Column: Requirement
+                    let td = document.createElement("td");
+                    td.appendChild(buildRequirementSelect(criterion));
+                    row.appendChild(td);
+
+                    // Column: Expected
+                    td = document.createElement("td");
+                    td.appendChild(buildExpected(criterion));
+                    row.appendChild(td);
+
+                    // Column: Ends with Input
+                    td = document.createElement("td");
+                    td.appendChild(buildEndsWithInputChecbox(criterion));
+                    row.appendChild(td);
+
+                    tblBdy.appendChild(row);
+                }
+            }
+
+            function buildRequirementSelect(criterion) {
+                let select = document.createElement("select");
+                select.appendChild(buildOption("exact", "Exact"));
+                select.appendChild(buildOption("pattern", "Regular Expression"));
+                select.appendChild(buildOption("ignore", "Ignore"));
+                select.value = criterion.requirement;
+                return select;
+            }
+
+            function buildOption(value, text, selected) {
+                let option = document.createElement("option");
+                option.value = value;
+                option.innerHTML = text;
+
+                option.selected = selected !== undefined && selected === true;
+
+                return option;
+            }
+
+            function buildExpected(criterion) {
+                let input = document.createElement("input");
+                input.type = "text";
+                input.value = criterion.expected;
+                return input;
+            }
+
+            function buildEndsWithInputChecbox(criterion) {
+                let checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                if (criterion["endsWithInput"] !== undefined && criterion["endsWithInput"] === true) {
+                    checkbox.checked = true;
+                }
+                return checkbox;
+            }
+        </script>
+        <script>
             let files = {};
             let content = {};
             let compile = {};
@@ -117,7 +241,7 @@
                 if (run.name.trim().length > 0) {
                     runs[run.name] = run;
 
-                    console.log(runs);
+                    refreshRunSelectOptions();
                 } else {
                     window.alert("Cannot save run because the name is blank");
                 }
@@ -136,7 +260,7 @@
                     for (let name in runs) {
                         let run = runs[name];
                         run.name = name;
-                        rubric.runs.append(run)
+                        rubric.runs.push(run)
                     }
 
                     // From: https://web.dev/patterns/files/save-a-file
@@ -174,7 +298,7 @@
                     reader.onload = (e) => {
                         const fileContent = e.target.result;
                         console.log("Raw File Content:", fileContent);
-                        // You can now pass fileContent to your custom parser logic
+                        parseRubric(fileContent);
                     };
 
                     // Triggered if an error occurs during reading
@@ -189,7 +313,6 @@
     <body>
         <nav>
             <button id="saveBtn">Save to Downloads</button>
-            <!-- TODO: File Picker -->
             <input id="filePicker" type="file" accept=".json" />
         </nav>
         <section id="files">
@@ -205,7 +328,7 @@
             <button id="newRunBtn">New Run</button><br/>
 
             <select id="runSlt"></select>
-            <button id="loadRunBtn">Load Run</button><br/>
+            <button id="loadRunBtn" onclick="loadRun()">Load Run</button><br/>
 
             <input id="runName" type="text" />
             <button id="saveRunBtn" onclick="saveRun()">Save Run</button>
