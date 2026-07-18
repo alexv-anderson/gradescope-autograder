@@ -15,12 +15,55 @@
 
                 return {
                     name: extractName(),
+                    events: extractEvents(document.getElementById("eventTblBdy")),
                     criteria: extractCriteria(tbl)
                 };
             }
 
             function extractName() {
                 return document.getElementById("runName").value
+            }
+
+            function extractEvents(tblBdy) {
+                let before = [];
+                let after = [];
+
+                for (let row of tblBdy.children) {
+
+                    let eventType = null;
+                    let cmd = null;
+
+                    let colI = 0;
+                    for (let datum of row.children) {
+                        let tag = datum.children[0];
+                        if (colI === 0) {
+                            eventType = tag.value;
+                        } else if (colI === 1) {
+                            cmd = tag.value;
+                        } else {
+                            window.alert("Too many columns in event table");
+                        }
+
+                        colI++;
+                    }
+
+                    if (eventType !== null && cmd !== null) {
+                        if (eventType === "before") {
+                            before.push(cmd.split(" "));
+                        } else if (eventType === "after") {
+                            after.push(cmd.split(" "));
+                        } else {
+                            window.alert("Unrecognized eventType = " + eventType);
+                        }
+                    } else {
+                        window.alert("Error: eventType = " + eventType + " cmd = " + cmd);
+                    }
+                }
+
+                return {
+                    before: before.length > 0 ? before : undefined,
+                    after: after.length > 0 ? after : undefined
+                }
             }
 
             function extractCriteria(tbl) {
