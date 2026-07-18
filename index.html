@@ -15,6 +15,9 @@
 
                 return {
                     name: extractName(),
+                    cmd: document.getElementById("runCmd").value.split(" "),
+                    input: document.getElementById("runInFN").value,
+                    points: parseFloat(document.getElementById("runPts").value),
                     events: extractEvents(document.getElementById("eventTblBdy")),
                     criteria: extractCriteria(tbl)
                 };
@@ -460,7 +463,7 @@
                 <div class="w3-panel w3-card-4" style="width: 50%;">
                     Name <input id="runName" class="w3-input w3-border" type="text" /><br/>
                     Command <input id="runCmd" class="w3-input w3-border" type="text" /><br/>
-                    Input File Name <input id="runCmd" class="w3-input w3-border" type="text" /><br/>
+                    Input File Name <input id="runInFN" class="w3-input w3-border" type="text" /><br/>
                     Points <input id="runPts" class="w3-input w3-border" type="number" /><br/>
                     <button id="saveRunBtn" class="w3-btn w3-green" onclick="saveRun()">Save Run</button>
                 </div>
