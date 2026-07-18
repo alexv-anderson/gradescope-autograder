@@ -126,7 +126,7 @@
 
                 let runNameInput = document.getElementById("runName");
                 runNameInput.value = runName;
-                runNameInput.hidden = true;
+                runNameInput.disabled = true;
 
                 for (let criterion of runs[runName].criteria) {
                     let row = document.createElement("tr");
@@ -209,7 +209,7 @@
                 // Empty and show run name field
                 let runNameInput = document.getElementById("runName");
                 runNameInput.value = "";
-                runNameInput.hidden = false;
+                runNameInput.disabled = false;
 
                 // Clear run table and add empty row
                 let runTblBdy = document.getElementById("runTblBdy");
@@ -377,8 +377,13 @@
                 File Compile Requirements
             </section>
             <section id="runs" >
-                <input id="runName" type="text" />
-                <button id="saveRunBtn" class="w3-btn w3-green" onclick="saveRun()">Save Run</button>
+                <div class="w3-panel w3-card-4" style="width: 50%;">
+                    Name <input id="runName" class="w3-input w3-border" type="text" /><br/>
+                    Command <input id="runCmd" class="w3-input w3-border" type="text" /><br/>
+                    Input File Name <input id="runCmd" class="w3-input w3-border" type="text" /><br/>
+                    Points <input id="runPts" class="w3-input w3-border" type="number" /><br/>
+                    <button id="saveRunBtn" class="w3-btn w3-green" onclick="saveRun()">Save Run</button>
+                </div>
 
                 <table id="runTbl" class="w3-table-all">
                     <colgroup>
