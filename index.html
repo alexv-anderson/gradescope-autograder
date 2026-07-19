@@ -137,7 +137,6 @@
                     names.push(name);
                 }
 
-                console.log(selectedValue);
                 for (let name of names.sort()) {
                     let option = document.createElement("option");
                     option.innerHTML = name;
@@ -148,7 +147,6 @@
                     }
                     select.appendChild(option);
                 }
-                console.log(selectedValue);
 
                 select.value = selectedValue;
             }
@@ -166,14 +164,28 @@
                 }
 
                 let tblBdy = document.getElementById("runTblBdy");
-                while (tblBdy.firstChild) {
-                    tblBdy.removeChild(tblBdy.firstChild);
-                }
+                removeAllChildren(tblBdy);
 
                 let runNameInput = document.getElementById("runName");
                 runNameInput.value = runName;
                 runNameInput.disabled = true;
 
+                // Events
+                let eventTblBdy = document.getElementById("eventTblBdy");
+                removeAllChildren(eventTblBdy);
+                for (let eventType in runs[runName].events) {
+                    let cmds = runs[runName].events[eventType];
+
+                    if (cmds === undefined) {
+                        continue;
+                    }
+
+                    for (let cmd of cmds) {
+                        eventTblBdy.appendChild(buildEventRow(eventType, cmd));
+                    }
+                }
+
+                // Criteria
                 for (let criterion of runs[runName].criteria) {
                     let row = document.createElement("tr");
 
@@ -195,6 +207,55 @@
                     tblBdy.appendChild(row);
                 }
             }
+
+            function removeAllChildren(element) {
+                while (element.firstChild) {
+                    element.removeChild(element.firstChild);
+                }
+            }
+
+            //#region Inflating event table
+            function buildEventSelect(selected) {
+                let slt = document.createElement("select");
+
+                let opt = document.createElement("option");
+                opt.value = "before";
+                opt.innerHTML = "Before";
+                if (selected !== undefined && selected === "before") {
+                    opt.selected = true;
+                }
+                slt.appendChild(opt);
+
+                opt = document.createElement("option");
+                opt.value = "after";
+                opt.innerHTML = "After";
+                if (selected !== undefined && selected === "after") {
+                    opt.selected = true;
+                }
+                slt.appendChild(opt);
+
+                return slt;
+            }
+
+            function buildEventRow(type, cmd) {
+                let row = document.createElement("tr");
+
+                let td = document.createElement("td");
+                td.appendChild(buildEventSelect(type));
+                row.appendChild(td);
+
+                td = document.createElement("td");
+                row.appendChild(td);
+
+                let input = document.createElement("input");
+                input.classList.add("w3-input", "w3-border");
+                input.style.width = "100%";
+                input.value = cmd.join(" ");
+                td.appendChild(input);
+
+                return row;
+            }
+            //#endregion
 
             //#region Inflating run table
             function buildRequirementSelect(criterion) {
@@ -256,21 +317,8 @@
 
                 // Event type select
                 let td = document.createElement("td");
+                td.appendChild(buildEventSelect());
                 row.appendChild(td);
-
-                let slt = document.createElement("select");
-                td.appendChild(slt);
-
-                let opt = document.createElement("option");
-                opt.value = "before";
-                opt.innerHTML = "Before";
-                opt.selected = true;
-                slt.appendChild(opt);
-
-                opt = document.createElement("option");
-                opt.value = "after";
-                opt.innerHTML = "After";
-                slt.appendChild(opt);
 
                 // Command input
                 td = document.createElement("td");
