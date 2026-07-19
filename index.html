@@ -240,17 +240,30 @@
             function buildEventRow(type, cmd) {
                 let row = document.createElement("tr");
 
+                // Row select checkbox
+                let checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+
                 let td = document.createElement("td");
+                td.appendChild(checkbox);
+                row.appendChild(td);
+
+                // Event type select
+                td = document.createElement("td");
                 td.appendChild(buildEventSelect(type));
                 row.appendChild(td);
 
                 td = document.createElement("td");
                 row.appendChild(td);
 
+                // Event command
                 let input = document.createElement("input");
                 input.classList.add("w3-input", "w3-border");
+                input.type = "text";
                 input.style.width = "100%";
-                input.value = cmd.join(" ");
+                if (cmd !== undefined) {
+                    input.value = cmd.join(" ");
+                }
                 td.appendChild(input);
 
                 return row;
@@ -313,27 +326,8 @@
             }
 
             function addRunEvent() {
-                let row = document.createElement("tr");
-
-                // Event type select
-                let td = document.createElement("td");
-                td.appendChild(buildEventSelect());
-                row.appendChild(td);
-
-                // Command input
-                td = document.createElement("td");
-                row.appendChild(td);
-
-                let input = document.createElement("input");
-                td.appendChild(input);
-
-                input.classList.add("w3-input");
-                input.classList.add("w3-border");
-                input.style.width = "100%";
-                input.type = "text";
-
                 let tblBdy = document.getElementById("eventTblBdy");
-                tblBdy.appendChild(row);
+                tblBdy.appendChild(buildEventRow());
             }
 
             function addRun() {
@@ -353,6 +347,26 @@
                 // Update UI
                 showRunEditor();
             }
+
+            function removeEventRows() {
+                removeRows(document.getElementById("eventTblBdy"));
+            }
+            function removeCriteriaRows() {
+                removeRows(document.getElementById("runTblBdy"));
+            }
+
+            function removeRows(tblBdy) {
+                let selectedTRs = [];
+                for (let tr of tblBdy.children) {
+                    if (tr.firstElementChild.firstElementChild.checked) {
+                        selectedTRs.push(tr);
+                    }
+                }
+
+                for (let tr of selectedTRs) {
+                    tblBdy.removeChild(tr);
+                }
+            }
         </script>
         <script>
             let files = {};
@@ -362,6 +376,15 @@
 
             function addLine() {
                 let row = document.createElement("tr");
+
+                // Checkbox
+                let checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.classList.add("w3-input");
+
+                let td = document.createElement("td");
+                td.appendChild(checkbox);
+                row.appendChild(td);
 
                 // Select
                 let select = document.createElement("select");
@@ -381,7 +404,7 @@
                 opt.innerHTML = "Ignore";
                 select.appendChild(opt);
 
-                let td = document.createElement("td");
+                td = document.createElement("td");
                 td.appendChild(select);
                 row.appendChild(td);
 
@@ -519,11 +542,13 @@
                     <h3>Events</h3>
                     <table class="w3-table-all">
                         <colgroup>
+                            <col style="min-width: 10px;" />
                             <col style="width: fit-content;" />
                             <col style="width: 100%;" />
                         </colgroup>
                         <thead>
                             <tr>
+                                <th><input type="checkbox" disabled/></th>
                                 <th>Type</th>
                                 <th>Command</th>
                             </tr>
@@ -532,16 +557,19 @@
                         </tbody>
                     </table>
                     <button class="w3-btn w3-green" onclick="addRunEvent()">Add Event</button>
+                    <button class="w3-btn w3-red" onclick="removeEventRows()">Remove selected row(s)</button>
                 </div>
 
                 <table id="runTbl" class="w3-table-all">
                     <colgroup>
+                        <col style="width: fit-content; min-width: 15px;"/>
                         <col style="width: fit-content;"/>
                         <col style="width: 100%;" />
                         <col style="width: fit-content"/>
                     </colgroup>
                     <thead>
                         <tr class="w3-brown">
+                            <th><input type="checkbox" disabled/></th>
                             <th>Requirement</th>
                             <th>Expected</th>
                             <th>Ends&nbsp;with&nbsp;Input?</th>
@@ -549,6 +577,7 @@
                     </thead>
                     <tbody id="runTblBdy">
                         <tr>
+                            <td><input type="checkbox" /></td>
                             <td>
                                 <select>
                                     <option value="exact">Exact</option>
@@ -562,6 +591,7 @@
                     </tbody>
                 </table>
                 <button onclick="addLine()">+ Add Line</button>
+                <button onclick="removeCriteriaRows()" class="w3-btn w3-red">Delete selected row(s)</button>
             </section>
         </div>
     </body>
