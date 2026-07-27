@@ -40,8 +40,10 @@
                     for (let datum of row.children) {
                         let tag = datum.children[0];
                         if (colI === 0) {
-                            eventType = tag.value;
+                            // Select checkbox
                         } else if (colI === 1) {
+                            eventType = tag.value;
+                        } else if (colI === 2) {
                             cmd = tag.value;
                         } else {
                             window.alert("Too many columns in event table");
@@ -88,10 +90,12 @@
                 for (let datum of row.children) {
                     let tag = datum.children[0];
                     if (i === 0) {
-                        criterion.requirement = tag.value;
+                        // Checkbox
                     } else if (i === 1) {
+                        criterion.requirement = tag.value;
+                    } else if (i === 2) {
                         criterion.expected = tag.value;
-                    } else if (i == 2) {
+                    } else if (i == 3) {
                         criterion.endsWithInput = tag.checked;
                     } else {
                         window.alert("Too many columns in criteria table");
@@ -99,6 +103,8 @@
 
                     i++;
                 }
+
+                console.log(criterion);
 
                 return criterion;
             }
@@ -187,25 +193,17 @@
 
                 // Criteria
                 for (let criterion of runs[runName].criteria) {
-                    let row = document.createElement("tr");
-
-                    // Column: Requirement
-                    let td = document.createElement("td");
-                    td.appendChild(buildRequirementSelect(criterion));
-                    row.appendChild(td);
-
-                    // Column: Expected
-                    td = document.createElement("td");
-                    td.appendChild(buildExpected(criterion));
-                    row.appendChild(td);
-
-                    // Column: Ends with Input
-                    td = document.createElement("td");
-                    td.appendChild(buildEndsWithInputChecbox(criterion));
-                    row.appendChild(td);
-
-                    tblBdy.appendChild(row);
+                    tblBdy.appendChild(buildCriterionRow(criterion));
                 }
+            }
+
+            function duplicateRun() {
+                loadRun();
+
+                // Empty and show run name field
+                let runNameInput = document.getElementById("runName");
+                runNameInput.value = "";
+                runNameInput.disabled = false;
             }
 
             function removeAllChildren(element) {
@@ -271,6 +269,44 @@
             //#endregion
 
             //#region Inflating run table
+            function buildCriterionRow(criterion) {
+                let row = document.createElement("tr");
+
+                // Checkbox
+                let checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.classList.add("w3-input");
+
+                let td = document.createElement("td");
+                td.appendChild(checkbox);
+                row.appendChild(td);
+
+                // Select
+                let select = buildRequirementSelect(criterion);
+
+                td = document.createElement("td");
+                td.appendChild(select);
+                row.appendChild(td);
+
+                // Expected
+
+                let input = buildExpected(criterion);
+
+                td = document.createElement("td");
+                td.appendChild(input);
+                row.appendChild(td);
+
+                // Input
+
+                input = buildEndsWithInputChecbox(criterion);
+
+                td = document.createElement("td");
+                td.appendChild(input);
+                row.appendChild(td);
+
+                return row;
+            }
+
             function buildRequirementSelect(criterion) {
                 let select = document.createElement("select");
                 select.appendChild(buildOption("exact", "Exact"));
@@ -375,62 +411,10 @@
             let runs = {};
 
             function addLine() {
-                let row = document.createElement("tr");
-
-                // Checkbox
-                let checkbox = document.createElement("input");
-                checkbox.type = "checkbox";
-                checkbox.classList.add("w3-input");
-
-                let td = document.createElement("td");
-                td.appendChild(checkbox);
-                row.appendChild(td);
-
-                // Select
-                let select = document.createElement("select");
-
-                let opt = document.createElement("option");
-                opt.value = "exact";
-                opt.innerHTML = "Exact";
-                select.appendChild(opt);
-
-                opt = document.createElement("option");
-                opt.value = "pattern";
-                opt.innerHTML = "Regular Expression";
-                select.appendChild(opt);
-
-                opt = document.createElement("option");
-                opt.value = "ignore";
-                opt.innerHTML = "Ignore";
-                select.appendChild(opt);
-
-                td = document.createElement("td");
-                td.appendChild(select);
-                row.appendChild(td);
-
-                // Expected
-
-                let input = document.createElement("input");
-                input.type = "text";
-                input.style.width = "100%";
-
-                td = document.createElement("td");
-                td.appendChild(input);
-                row.appendChild(td);
-
-                // Input
-
-                input = document.createElement("input");
-                input.type = "checkbox";
-
-                td = document.createElement("td");
-                td.appendChild(input);
-                row.appendChild(td);
-
                 // Row
 
                 let table = document.getElementById("runTblBdy");
-                table.appendChild(row)
+                table.appendChild(buildCriterionRow())
             }
 
             function saveRun() {
@@ -516,7 +500,8 @@
             <button>Content</button><br/>
             <button>Compile</button><br/>
             Run <select id="runSlt"></select>
-            <button id="loadRunBtn" onclick="loadRun()">Load</button><br/>
+            <button id="loadRunBtn" onclick="loadRun()">Load</button>
+            <button id="dupRunBtn" onclick="duplicateRun()">Duplicate</button><br/>
             <button onclick="addRun()">Add Run</button><br/>
             <button id="saveBtn">Save to Downloads</button>
         </nav>
