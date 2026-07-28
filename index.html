@@ -294,6 +294,8 @@
 
                 td = document.createElement("td");
                 td.appendChild(input);
+                td.appendChild(document.createElement("br"));
+                td.appendChild(document.createElement("code"));
                 row.appendChild(td);
 
                 // Input
@@ -402,6 +404,12 @@
                 for (let tr of selectedTRs) {
                     tblBdy.removeChild(tr);
                 }
+            }
+
+            function updateSiblingCode(input) {
+                let br = input.nextElementSibling;
+                let code = br.nextElementSibling;
+                code.innerHTML = '"' + input.value + '"';
             }
         </script>
         <script>
@@ -570,7 +578,10 @@
                                     <option value="ignore">Ignore</option>
                                 </select>
                             </td>
-                            <td><input type="text" style="width: 100%;" /></td>
+                            <td>
+                                <input type="text" style="width: 100%;" onchange="updateSiblingCode(this)" /><br/>
+                                <code>" Hello "</code>
+                            </td>
                             <td><input type="checkbox" /></td>
                         </tr>
                     </tbody>
