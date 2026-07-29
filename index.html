@@ -314,7 +314,9 @@
                 select.appendChild(buildOption("exact", "Exact"));
                 select.appendChild(buildOption("pattern", "Regular Expression"));
                 select.appendChild(buildOption("ignore", "Ignore"));
-                select.value = criterion.requirement;
+                if (criterion !== undefined) {
+                    select.value = criterion.requirement;
+                }
                 return select;
             }
 
@@ -332,14 +334,17 @@
                 let input = document.createElement("input");
                 input.type = "text";
                 input.style.width = "100%";
-                input.value = criterion.expected;
+                input.addEventListener("change", updateSiblingCode);
+                if (criterion !== undefined) {
+                    input.value = criterion.expected;
+                }
                 return input;
             }
 
             function buildEndsWithInputChecbox(criterion) {
                 let checkbox = document.createElement("input");
                 checkbox.type = "checkbox";
-                if (criterion["endsWithInput"] !== undefined && criterion["endsWithInput"] === true) {
+                if (criterion !== undefined && criterion["endsWithInput"] !== undefined && criterion["endsWithInput"] === true) {
                     checkbox.checked = true;
                 }
                 return checkbox;
@@ -407,6 +412,7 @@
             }
 
             function updateSiblingCode(input) {
+                input = input.target !== undefined ? input.target : input;
                 let br = input.nextElementSibling;
                 let code = br.nextElementSibling;
                 code.innerHTML = '"' + input.value + '"';
