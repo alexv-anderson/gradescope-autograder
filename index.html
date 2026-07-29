@@ -272,35 +272,11 @@
                 }
             }
 
-            //#region Inflating event table
-            function buildEventSelect(selected) {
-                let slt = document.createElement("select");
-
-                let opt = document.createElement("option");
-                opt.value = "before";
-                opt.innerHTML = "Before";
-                if (selected !== undefined && selected === "before") {
-                    opt.selected = true;
-                }
-                slt.appendChild(opt);
-
-                opt = document.createElement("option");
-                opt.value = "after";
-                opt.innerHTML = "After";
-                if (selected !== undefined && selected === "after") {
-                    opt.selected = true;
-                }
-                slt.appendChild(opt);
-
-                return slt;
-            }
-
             function buildEventRow(type, cmd) {
                 return buildCheckSelectAndTextRow([
                     {label: "Before", value: "before"}, {label: "After", value: "after"}
                 ]);
             }
-            //#endregion
 
             //#region Inflating run table
             function buildCriterionRow(criterion) {
