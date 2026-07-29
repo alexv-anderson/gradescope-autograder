@@ -296,35 +296,9 @@
             }
 
             function buildEventRow(type, cmd) {
-                let row = document.createElement("tr");
-
-                // Row select checkbox
-                let checkbox = document.createElement("input");
-                checkbox.type = "checkbox";
-
-                let td = document.createElement("td");
-                td.appendChild(checkbox);
-                row.appendChild(td);
-
-                // Event type select
-                td = document.createElement("td");
-                td.appendChild(buildEventSelect(type));
-                row.appendChild(td);
-
-                td = document.createElement("td");
-                row.appendChild(td);
-
-                // Event command
-                let input = document.createElement("input");
-                input.classList.add("w3-input", "w3-border");
-                input.type = "text";
-                input.style.width = "100%";
-                if (cmd !== undefined) {
-                    input.value = cmd.join(" ");
-                }
-                td.appendChild(input);
-
-                return row;
+                return buildCheckSelectAndTextRow([
+                    {label: "Before", value: "before"}, {label: "After", value: "after"}
+                ]);
             }
             //#endregion
 
@@ -417,8 +391,7 @@
              * User DOM Manipulation
              */
 
-            //#region Content - Forbiddin Table
-            function addContentForbidRow() {
+            function buildCheckSelectAndTextRow(options) {
                 let row = document.createElement("tr");
 
                 // Checkbox
@@ -431,15 +404,12 @@
                 // Logic
                 let select = document.createElement("select");
 
-                let opt = document.createElement("option");
-                opt.value = "patterns";
-                opt.innerHTML = "Pattern";
-                select.appendChild(opt);
-
-                opt = document.createElement("option");
-                opt.value = "exceptions";
-                opt.innerHTML = "Exception";
-                select.appendChild(opt);
+                for (let option of options) {
+                    let opt = document.createElement("option");
+                    opt.innerHTML = option.label;
+                    opt.value = option.value;
+                    select.appendChild(opt);
+                }
 
                 td = document.createElement("td");
                 td.appendChild(select);
@@ -455,7 +425,14 @@
                 td.lastChild.innerHTML = '""'
                 row.appendChild(td);
 
-                document.getElementById("contentForbidTblBdy").appendChild(row)
+                return row;
+            }
+
+            //#region Content - Forbiddin Table
+            function addContentForbidRow() {
+                document.getElementById("contentForbidTblBdy").appendChild(buildCheckSelectAndTextRow(
+                    [{label: "Pattern", value: "patterns"}, {label: "Exception", value: "exceptions"}]
+                ));
             }
 
             function removeContentForbidRow() {
