@@ -10,6 +10,45 @@
              * Extract data from DOM
              */
 
+            //#region Content
+            function extractContent() {
+                delete content.forbidden;
+
+                let forbidden = {};
+                for (let row of document.getElementById("contentForbidTblBdy").children) {
+                    extractCotentFromRow(forbidden, row);
+                }
+
+                if (Object.keys(forbidden).length > 0) {
+                    content.forbidden = forbidden;
+                }
+            }
+
+            function extractCotentFromRow(obj, row) {
+                let category = null;
+
+                let i = 0;
+                for (let datum of row.children) {
+                    let tag = datum.children[0];
+                    if (i === 0) {
+                        // Checkbox
+                    } else if (i === 1) {
+                        category = tag.value;
+                    } else if (i === 2) {
+                        if (obj[category] === undefined) {
+                            obj[category] = [];
+                        }
+
+                        obj[category].push(tag.value);
+                    } else {
+                        window.alert("Too many columns in content table");
+                    }
+
+                    i++;
+                }
+            }
+            //#endregion
+
             function extractCompile() {
                 let compileCmd = document.getElementById("compileCmd").value;
                 if (compileCmd.trim().length === 0) {
@@ -378,6 +417,52 @@
              * User DOM Manipulation
              */
 
+            //#region Content - Forbiddin Table
+            function addContentForbidRow() {
+                let row = document.createElement("tr");
+
+                // Checkbox
+                let checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                let td = document.createElement("td");
+                td.appendChild(checkbox);
+                row.appendChild(td);
+
+                // Logic
+                let select = document.createElement("select");
+
+                let opt = document.createElement("option");
+                opt.value = "patterns";
+                opt.innerHTML = "Pattern";
+                select.appendChild(opt);
+
+                opt = document.createElement("option");
+                opt.value = "exceptions";
+                opt.innerHTML = "Exception";
+                select.appendChild(opt);
+
+                td = document.createElement("td");
+                td.appendChild(select);
+                row.appendChild(td);
+
+                // Expected
+                let input = buildExpected();
+
+                td = document.createElement("td");
+                td.appendChild(input);
+                td.appendChild(document.createElement("br"));
+                td.appendChild(document.createElement("code"));
+                td.lastChild.innerHTML = '""'
+                row.appendChild(td);
+
+                document.getElementById("contentForbidTblBdy").appendChild(row)
+            }
+
+            function removeContentForbidRow() {
+                removeRows(document.getElementById("contentForbidTblBdy"));
+            }
+            //#endregion
+
             function show(sectionID) {
                 for (let section of document.getElementsByTagName("section")) {
                     if (!section.classList.contains("hide")) {
@@ -548,9 +633,32 @@
             <section id="files" class="w3-container">
                 File Requirements
             </section>
+
             <section id="content" class="w3-container">
-                File Content Requirements
+                <h3>File Content (Optional)</h3>
+                <button class="w3-btn w3-green" onclick="extractContent()">Save</button>
+
+                <h4>Forrbidden</h4>
+                <table class="w3-table-all">
+                    <colgroup>
+                        <col style="min-width: 10px;" />
+                        <col style="width: fit-content;" />
+                        <col style="width: 100%;" />
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" disabled /></th>
+                            <th>Logic</th>
+                            <th>Rule</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contentForbidTblBdy">
+                    </tbody>
+                </table>
+                <button class="w3-btn w3-green" onclick="addContentForbidRow()">Add Row</button>
+                <button class="w3-btn w3-red" onclick="removeContentForbidRow()">Remove Selected Row(s)</button>
             </section>
+
             <section id="compile" class="w3-container">
                 <h3>Compile (Optional)</h3>
                 <p>The following command will be executed in the submission directory before any tests are run</p>
@@ -559,6 +667,7 @@
                 Points: <input id="compilePts" type="number" class="w3-input" /><br/>
                 <button id="compileSaveBtn" class="w3-btn w3-green" onclick="extractCompile()">Save</button>
             </section>
+
             <section id="runs" >
                 <div class="w3-panel w3-card-4" style="width: 50%;">
                     Name <input id="runName" class="w3-input w3-border" type="text" /><br/>
