@@ -158,6 +158,8 @@
             }
 
             function loadRun() {
+                show("runs");
+
                 let runName = document.getElementById("runSlt").value;
                 if (!runName) {
                     window.alert("Error: No run name");
@@ -357,16 +359,14 @@
              * User DOM Manipulation
              */
 
-            function hideAllSections() {
-                for (let id of ["files", "content", "compile", "runs"]) {
-                    let section = document.getElementById(id);
-                    section.style.display = "none";
+            function show(sectionID) {
+                for (let section of document.getElementsByTagName("section")) {
+                    if (!section.classList.contains("hide")) {
+                        section.classList.add("hide");
+                    }
                 }
-            }
 
-            function showRunEditor() {
-                hideAllSections();
-                document.getElementById("runs").style.display = "block";
+                document.getElementById(sectionID).classList.remove("hide");
             }
 
             function addRunEvent() {
@@ -389,7 +389,7 @@
                 addLine();
 
                 // Update UI
-                showRunEditor();
+                show("runs");
             }
 
             function removeEventRows() {
@@ -504,16 +504,21 @@
                     reader.readAsText(file);
                 });
 
-                showRunEditor();
+                show("runs");
             });
         </script>
+        <style>
+            .hide {
+                display: none;
+            }
+        </style>
     </head>
     <body>
         <nav class="w3-sidebar w3-bar-block" style="width: 25%">
             <input id="filePicker" type="file" accept=".json" /><br/>
-            <button>Files</button><br/>
-            <button>Content</button><br/>
-            <button>Compile</button><br/>
+            <button onclick="show('files')">Files</button><br/>
+            <button onclick="show('content')">Content</button><br/>
+            <button onclick="show('compile')">Compile</button><br/>
             Run <select id="runSlt"></select>
             <button id="loadRunBtn" onclick="loadRun()">Load</button>
             <button id="dupRunBtn" onclick="duplicateRun()">Duplicate</button><br/>
