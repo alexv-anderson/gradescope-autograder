@@ -189,6 +189,37 @@
                 }
 
                 loadCompile();
+
+                // Content
+                if (rubric.content !== undefined) {
+                    content = rubric.content;
+                }
+
+                loadContent();
+            }
+
+            function loadContent() {
+                let tblBdy = document.getElementById("contentForbidTblBdy");
+
+                if (content.forbidden !== undefined) {
+                    if (content.forbidden.patterns !== undefined) {
+                        for (let pattern of content.forbidden.patterns) {
+                            tblBdy.appendChild(buildCheckSelectAndTextRow(
+                                [{label: "Pattern", value: "patterns"}, {label: "Exception", value: "exceptions"}],
+                                "patterns", pattern
+                            ));
+                        }
+                    }
+
+                    if (content.forbidden.exceptions !== undefined) {
+                        for (let exception of content.forbidden.exceptions) {
+                            tblBdy.appendChild(buildCheckSelectAndTextRow(
+                                [{label: "Pattern", value: "patterns"}, {label: "Exception", value: "exceptions"}],
+                                "exceptions", exception
+                            ));
+                        }
+                    }
+                }
             }
 
             function loadCompile() {
@@ -293,7 +324,7 @@
             function buildEventRow(type, cmd) {
                 return buildCheckSelectAndTextRow([
                     {label: "Before", value: "before"}, {label: "After", value: "after"}
-                ]);
+                ], type, cmd);
             }
 
             //#region Inflating run table
@@ -385,7 +416,7 @@
              * User DOM Manipulation
              */
 
-            function buildCheckSelectAndTextRow(options) {
+            function buildCheckSelectAndTextRow(options, selected, text) {
                 let row = document.createElement("tr");
 
                 // Checkbox
@@ -402,6 +433,9 @@
                     let opt = document.createElement("option");
                     opt.innerHTML = option.label;
                     opt.value = option.value;
+                    if (selected !== undefined && opt.value === selected) {
+                        opt.selected = true;
+                    }
                     select.appendChild(opt);
                 }
 
@@ -418,6 +452,11 @@
                 td.appendChild(document.createElement("code"));
                 td.lastChild.innerHTML = '""'
                 row.appendChild(td);
+
+                if (text !== undefined) {
+                    input.value = text;
+                    input.dispatchEvent(new Event("change", {bubbles: true}));
+                }
 
                 return row;
             }
