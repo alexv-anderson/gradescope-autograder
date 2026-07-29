@@ -10,6 +10,24 @@
              * Extract data from DOM
              */
 
+            function extractCompile() {
+                let compileCmd = document.getElementById("compileCmd").value;
+                if (compileCmd.trim().length === 0) {
+                    compile = {}
+                    return;
+                }
+
+                compile.cmd = compileCmd.split(" ");
+
+                let sCompilePts = document.getElementById("compilePts").value;
+                if (sCompilePts.trim().length === 0) {
+                    compile.points = 0;
+                } else {
+                    compile.points = parseFloat(sCompilePts);
+                }
+            }
+
+            //#region Extract test runs
             function extractRun() {
                 let tbl = document.getElementById("runTblBdy");
 
@@ -108,6 +126,7 @@
 
                 return criterion;
             }
+            //#endregion
         </script>
         <script>
             /**
@@ -533,7 +552,12 @@
                 File Content Requirements
             </section>
             <section id="compile" class="w3-container">
-                File Compile Requirements
+                <h3>Compile (Optional)</h3>
+                <p>The following command will be executed in the submission directory before any tests are run</p>
+                Command: <input id="compileCmd" type="text" class="w3-input" onchange="updateSiblingCode(this)" /><br/>
+                <code>""</code><br/>
+                Points: <input id="compilePts" type="number" class="w3-input" /><br/>
+                <button id="compileSaveBtn" class="w3-btn w3-green" onclick="extractCompile()">Save</button>
             </section>
             <section id="runs" >
                 <div class="w3-panel w3-card-4" style="width: 50%;">
