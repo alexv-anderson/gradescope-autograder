@@ -182,6 +182,24 @@
 
                 refreshRunSelectOptions();
                 loadRun();
+
+                // Compile
+                if (rubric.compile !== undefined) {
+                    compile = rubric.compile;
+                }
+
+                loadCompile();
+            }
+
+            function loadCompile() {
+                if (compile.cmd === undefined) {
+                    return;
+                }
+
+                document.getElementById("compileCmd").value = compile.cmd.join(" ");
+                document.getElementById("compileCmd").dispatchEvent(new Event("change", {bubbles: true}));
+
+                document.getElementById("compilePts").value = compile.points;
             }
 
             function refreshRunSelectOptions() {
