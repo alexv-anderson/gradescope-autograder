@@ -296,6 +296,7 @@
                 td.appendChild(input);
                 td.appendChild(document.createElement("br"));
                 td.appendChild(document.createElement("code"));
+                td.lastChild.innerHTML = '""'
                 row.appendChild(td);
 
                 // Input
@@ -586,7 +587,7 @@
                             </td>
                             <td>
                                 <input type="text" style="width: 100%;" onchange="updateSiblingCode(this)" /><br/>
-                                <code>" Hello "</code>
+                                <code>""</code>
                             </td>
                             <td><input type="checkbox" /></td>
                         </tr>
