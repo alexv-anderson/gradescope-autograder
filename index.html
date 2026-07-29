@@ -10,13 +10,41 @@
              * Extract data from DOM
              */
 
+            function extractFileChecks() {
+                // Required table
+                let req = {};
+                for (let row of document.getElementById("filesReqTblBdy").children) {
+                    extractContentFromRow(req, row);
+                }
+
+                if (req.allowed !== undefined) {
+                    files.allowed = req.allowed;
+                    delete req.allowed;
+                }
+
+                if (Object.keys(req).length > 0) {
+                    files.required = req;
+                }
+
+                // Forbidden table
+
+                let forbidden = {};
+                for (let row of document.getElementById("filesForbidTblBdy").children) {
+                    extractContentFromRow(forbidden, row);
+                }
+
+                if (Object.keys(forbidden).length > 0) {
+                    files.forbidden = forbidden;
+                }
+            }
+
             //#region Content
             function extractContent() {
                 delete content.forbidden;
 
                 let forbidden = {};
                 for (let row of document.getElementById("contentForbidTblBdy").children) {
-                    extractCotentFromRow(forbidden, row);
+                    extractContentFromRow(forbidden, row);
                 }
 
                 if (Object.keys(forbidden).length > 0) {
@@ -24,7 +52,7 @@
                 }
             }
 
-            function extractCotentFromRow(obj, row) {
+            function extractContentFromRow(obj, row) {
                 let category = null;
 
                 let i = 0;
@@ -666,6 +694,8 @@
         <div class="w3-container" style="margin-left: 25%">
             <section id="files" class="w3-container">
                 <h3>File Checks (Optional)</h3>
+                <button class="w3-btn w3-green" onclick="extractFileChecks()">Save</button>
+
                 <div class="w3-panel">
                     <h4>Requirements</h4>
                     <p>All submitted files must meet the following requirements</p>
