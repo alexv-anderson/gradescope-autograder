@@ -224,6 +224,59 @@
                 }
 
                 loadContent();
+
+                // Files
+                if (rubric.files !== undefined) {
+                    files = rubric.files;
+                }
+
+                loadFileChecks();
+            }
+
+            function loadFileChecks() {
+                let tblBdy = document.getElementById("filesReqTblBdy");
+                let sltOpts = [
+                    {label: "Allowed", value: "allowed"}, {label: "Name", value: "names"}, {label: "Pattern", value: "patterns"}
+                ];
+
+                if (files.required !== undefined) {
+                    if (files.required.names !== undefined) {
+                        for (let name of files.required.names) {
+                            tblBdy.appendChild(buildCheckSelectAndTextRow(sltOpts, "names", name));
+                        }
+                    }
+
+                    if (files.required.patterns !== undefined) {
+                        for (let pattern of files.required.patterns) {
+                            tblBdy.appendChild(buildCheckSelectAndTextRow(sltOpts, "patterns", pattern));
+                        }
+                    }
+                }
+
+                if (files.allowed !== undefined) {
+                    for (let allow of files.allowed) {
+                        tblBdy.appendChild(buildCheckSelectAndTextRow(sltOpts, "allowed", allow));
+                    }
+                }
+
+                tblBdy = document.getElementById("filesForbidTblBdy");
+                sltOpts = [
+                    {label: "Pattern", value: "patterns"}, {label: "Exception", value: "exceptions"}
+                ];
+
+                if (files.forbidden !== undefined) {
+                    if (files.forbidden.patterns !== undefined) {
+                        for (let pattern of files.forbidden.patterns) {
+                            tblBdy.appendChild(buildCheckSelectAndTextRow(sltOpts, "patterns", pattern));
+                        }
+                    }
+
+                    if (files.forbidden.exceptions !== undefined) {
+                        for (let exception of files.forbidden.exceptions) {
+                            tblBdy.appendChild(buildCheckSelectAndTextRow(sltOpts, "exceptions", exception));
+                        }
+                    }
+                }
             }
 
             function loadContent() {
