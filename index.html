@@ -476,18 +476,33 @@
                     return;
                 }
 
-                let tblBdy = document.getElementById("runTblBdy");
-                removeAllChildren(tblBdy);
+                let run = runs[runName];
 
+                // Run name
                 let runNameInput = document.getElementById("runName");
                 runNameInput.value = runName;
                 runNameInput.disabled = true;
 
+                // Command
+                if (run.cmd !== undefined) {
+                    document.getElementById("runCmd").value = run.cmd.join(" ");
+                }
+
+                // Input file
+                if (run.input !== undefined) {
+                    document.getElementById("runInFN").value = run.input;
+                }
+
+                // Points
+                if (run.points !== undefined) {
+                    document.getElementById("runPts").value = run.points;
+                }
+
                 // Events
                 let eventTblBdy = document.getElementById("eventTblBdy");
                 removeAllChildren(eventTblBdy);
-                for (let eventType in runs[runName].events) {
-                    let cmds = runs[runName].events[eventType];
+                for (let eventType in run.events) {
+                    let cmds = run.events[eventType];
 
                     if (cmds === undefined) {
                         continue;
@@ -499,7 +514,10 @@
                 }
 
                 // Criteria
-                for (let criterion of runs[runName].criteria) {
+                let tblBdy = document.getElementById("runTblBdy");
+                removeAllChildren(tblBdy);
+
+                for (let criterion of run.criteria) {
                     tblBdy.appendChild(buildCriterionRow(criterion));
                 }
             }
