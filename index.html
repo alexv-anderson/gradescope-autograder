@@ -429,15 +429,7 @@
                 row.appendChild(td);
 
                 // Expected
-
-                let input = buildExpected(criterion);
-
-                td = document.createElement("td");
-                td.appendChild(input);
-                td.appendChild(document.createElement("br"));
-                td.appendChild(document.createElement("code"));
-                td.lastChild.innerHTML = '""'
-                row.appendChild(td);
+                row.appendChild(buildTextCodeCell(criterion));
 
                 // Input
 
@@ -471,15 +463,24 @@
                 return option;
             }
 
-            function buildExpected(criterion) {
+            function buildTextCodeCell(criterion) {
                 let input = document.createElement("input");
                 input.type = "text";
                 input.style.width = "100%";
                 input.addEventListener("change", updateSiblingCode);
+
+                td = document.createElement("td");
+                td.appendChild(input);
+                td.appendChild(document.createElement("br"));
+                td.appendChild(document.createElement("code"));
+                td.lastChild.innerHTML = '""'
+
                 if (criterion !== undefined) {
                     input.value = criterion.expected;
+                    input.dispatchEvent(new Event("change", {bubbles: true}));
                 }
-                return input;
+
+                return td;
             }
 
             function buildEndsWithInputChecbox(criterion) {
@@ -525,14 +526,7 @@
                 row.appendChild(td);
 
                 // Expected
-                let input = buildExpected();
-
-                td = document.createElement("td");
-                td.appendChild(input);
-                td.appendChild(document.createElement("br"));
-                td.appendChild(document.createElement("code"));
-                td.lastChild.innerHTML = '""'
-                row.appendChild(td);
+                row.appendChild(buildTextCodeCell());
 
                 if (text !== undefined) {
                     input.value = text;
