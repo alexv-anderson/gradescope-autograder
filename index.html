@@ -36,6 +36,26 @@
                 if (Object.keys(forbidden).length > 0) {
                     files.forbidden = forbidden;
                 }
+
+                // Support table
+                support = [];
+                for (let row of document.getElementById("filesSupportTblBdy").children) {
+                    let colI = 0;
+                    for (let datum of row.children) {
+                        let tag = datum.children[0];
+                        if (colI === 0) {
+                            // Checkbox
+                        } else if (colI === 1) {
+                            support.push({src: tag.value});
+                        } else if (colI === 2) {
+                            support[support.length-1].dst = tag.value;
+                        } else {
+                            window.alert("Too many columns in file support table");
+                        }
+
+                        colI++;
+                    }
+                }
             }
 
             //#region Content
@@ -230,6 +250,10 @@
                     files = rubric.files;
                 }
 
+                if (rubric.support !== undefined) {
+                    support = rubric.support;
+                }
+
                 loadFileChecks();
             }
 
@@ -276,6 +300,11 @@
                             tblBdy.appendChild(buildCheckSelectAndTextRow(sltOpts, "exceptions", exception));
                         }
                     }
+                }
+
+                tblBdy = document.getElementById("filesSupportTblBdy");
+                for (let sup of support) {
+                    addFilesSupportRow(sup.src, sup.dst);
                 }
             }
 
@@ -560,6 +589,38 @@
             }
             //#endregion
 
+            //#region Files - Support Table
+            function addFilesSupportRow(src, dst) {
+                let row = document.createElement("tr");
+
+                // Checkbox
+                let checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                row.appendChild(document.createElement("td"));
+                row.lastChild.appendChild(checkbox);
+
+                // Src
+                if (src !== undefined) {
+                    row.appendChild(buildTextCodeCell({expected: src}));
+                } else {
+                    row.appendChild(buildTextCodeCell());
+                }
+
+                // Dst
+                if (dst !== undefined) {
+                    row.appendChild(buildTextCodeCell({expected: dst}));
+                } else {
+                    row.appendChild(buildTextCodeCell());
+                }
+
+                document.getElementById("filesSupportTblBdy").appendChild(row);
+            }
+
+            function removeFilesSupportRow() {
+                removeRows(document.getElementById("filesSupportTblBdy"));
+            }
+            //#endregion
+
             //#region Content - Forbiddin Table
             function addContentForbidRow() {
                 document.getElementById("contentForbidTblBdy").appendChild(buildCheckSelectAndTextRow(
@@ -634,6 +695,7 @@
         </script>
         <script>
             let files = {};
+            let support = [];
             let content = {};
             let compile = {};
             let runs = {};
@@ -661,6 +723,7 @@
                 document.getElementById("saveBtn").addEventListener("click", function() {
                     let rubric = {
                         files: files,
+                        support: support,
                         content: content,
                         compile: compile,
                         runs: []
@@ -796,6 +859,29 @@
                     </table>
                     <button class="w3-btn w3-green" onclick="addFilesForbidRow()">Add Row</button>
                     <button class="w3-btn w3-red" onclick="removeFilesForbidRow()">Remove Selected Row(s)</button>
+                </div>
+
+                <div class="w3-panel w3-card-4">
+                    <h4>Support</h4>
+                    <p>Relative paths for files which will are being provided by the grader instead of in the individual submission.<br/><i>Note: <code>src</code> paths are relative to <code>/autograder/source/</code> while <code>dst</code> paths are relative to <code>/autograder/submission/</code></i></p>
+                    <table class="w3-table-all">
+                        <colgroup>
+                            <col style="min-width: 10px;" />
+                            <col style="width: 50%;" />
+                            <col style="width: 50%;" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" disabled /></th>
+                                <th><code>src</code></th>
+                                <th><code>dst</code></th>
+                            </tr>
+                        </thead>
+                        <tbody id="filesSupportTblBdy">
+                        </tbody>
+                    </table>
+                    <button class="w3-btn w3-green" onclick="addFilesSupportRow()">Add Row</button>
+                    <button class="w3-btn w3-red" onclick="removeFilesSupportRow()">Remove Selected Row(s)</button>
                 </div>
             </section>
 
