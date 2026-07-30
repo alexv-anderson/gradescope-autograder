@@ -724,6 +724,14 @@
             .hide {
                 display: none;
             }
+
+            button {
+                margin-bottom: 10px;
+            }
+
+            table {
+                margin-bottom: 10px;
+            }
         </style>
     </head>
     <body>
@@ -735,7 +743,7 @@
             Run <select id="runSlt"></select>
             <button id="loadRunBtn" onclick="loadRun()">Load</button>
             <button id="dupRunBtn" onclick="duplicateRun()">Duplicate</button><br/>
-            <button onclick="addRun()">Add Run</button><br/>
+            <button onclick="addRun()">Add Test Case</button><br/>
             <button id="saveBtn">Save to Downloads</button>
         </nav>
         <div class="w3-container" style="margin-left: 25%">
@@ -825,15 +833,20 @@
             </section>
 
             <section id="runs" >
-                <div class="w3-panel w3-card-4" style="width: 50%;">
+                <h2>Test Case Editor</h2>
+                <p>Edit how a test case will be run</p>
+                <button id="saveRunBtn" class="w3-btn w3-green" onclick="saveRun()">Save Run</button>
+                <div class="w3-panel w3-card-4" style="width: 50%; padding-bottom: 10px;">
+                    <h3>Settings</h3>
                     Name <input id="runName" class="w3-input w3-border" type="text" /><br/>
                     Command <input id="runCmd" class="w3-input w3-border" type="text" /><br/>
                     Input File Name <input id="runInFN" class="w3-input w3-border" type="text" /><br/>
-                    Points <input id="runPts" class="w3-input w3-border" type="number" /><br/>
-                    <button id="saveRunBtn" class="w3-btn w3-green" onclick="saveRun()">Save Run</button>
+                    Points <input id="runPts" class="w3-input w3-border" type="number" />
                 </div>
-                <div class="w3-panel">
+
+                <div class="w3-panel w3-card-4">
                     <h3>Events</h3>
+                    <p>List shell commands to be executed when evaluating the test case.</p>
                     <table class="w3-table-all">
                         <colgroup>
                             <col style="min-width: 10px;" />
@@ -854,41 +867,30 @@
                     <button class="w3-btn w3-red" onclick="removeEventRows()">Remove selected row(s)</button>
                 </div>
 
-                <table id="runTbl" class="w3-table-all">
-                    <colgroup>
-                        <col style="width: fit-content; min-width: 15px;"/>
-                        <col style="width: fit-content;"/>
-                        <col style="width: 100%;" />
-                        <col style="width: fit-content"/>
-                    </colgroup>
-                    <thead>
-                        <tr class="w3-brown">
-                            <th><input type="checkbox" disabled/></th>
-                            <th>Requirement</th>
-                            <th>Expected</th>
-                            <th>Ends&nbsp;with&nbsp;Input?</th>
-                        </tr>
-                    </thead>
-                    <tbody id="runTblBdy">
-                        <tr>
-                            <td><input type="checkbox" /></td>
-                            <td>
-                                <select>
-                                    <option value="exact">Exact</option>
-                                    <option value="pattern">Regular Expression</option>
-                                    <option value="ignore">Ignore</option>
-                                </select>
-                            </td>
-                            <td>
-                                <input type="text" style="width: 100%;" onchange="updateSiblingCode(this)" /><br/>
-                                <code>""</code>
-                            </td>
-                            <td><input type="checkbox" /></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <button onclick="addLine()">+ Add Line</button>
-                <button onclick="removeCriteriaRows()" class="w3-btn w3-red">Delete selected row(s)</button>
+                <div class="w3-panel w3-card-4">
+                    <h3>Standard Out Criteria</h3>
+                    <p>Give criteria for all lines written to standard out when the test case's command is executed.</p>
+                    <table id="runTbl" class="w3-table-all">
+                        <colgroup>
+                            <col style="width: fit-content; min-width: 15px;"/>
+                            <col style="width: fit-content;"/>
+                            <col style="width: 100%;" />
+                            <col style="width: fit-content"/>
+                        </colgroup>
+                        <thead>
+                            <tr class="w3-brown">
+                                <th><input type="checkbox" disabled/></th>
+                                <th>Requirement</th>
+                                <th>Expected</th>
+                                <th>Ends&nbsp;with&nbsp;Input?</th>
+                            </tr>
+                        </thead>
+                        <tbody id="runTblBdy">
+                        </tbody>
+                    </table>
+                    <button class="w3-btn w3-green" onclick="addLine()">Add Line</button>
+                    <button class="w3-btn w3-red" onclick="removeCriteriaRows()">Delete selected row(s)</button>
+                </div>
             </section>
         </div>
     </body>
