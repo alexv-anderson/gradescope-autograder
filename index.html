@@ -800,27 +800,31 @@
 
             <section id="content" class="w3-container">
                 <h3>File Content (Optional)</h3>
+                <p>Describe criteria for the contents of all files.</p>
                 <button class="w3-btn w3-green" onclick="extractContent()">Save</button>
 
-                <h4>Forrbidden</h4>
-                <table class="w3-table-all">
-                    <colgroup>
-                        <col style="min-width: 10px;" />
-                        <col style="width: fit-content;" />
-                        <col style="width: 100%;" />
-                    </colgroup>
-                    <thead>
-                        <tr>
-                            <th><input type="checkbox" disabled /></th>
-                            <th>Logic</th>
-                            <th>Rule</th>
-                        </tr>
-                    </thead>
-                    <tbody id="contentForbidTblBdy">
-                    </tbody>
-                </table>
-                <button class="w3-btn w3-green" onclick="addContentForbidRow()">Add Row</button>
-                <button class="w3-btn w3-red" onclick="removeContentForbidRow()">Remove Selected Row(s)</button>
+                <div class="w3-panel w3-card-4">
+                    <h4>Forrbidden</h4>
+                    <p>List regular expressions which describe forbidden content.</p>
+                    <table class="w3-table-all">
+                        <colgroup>
+                            <col style="min-width: 10px;" />
+                            <col style="width: fit-content;" />
+                            <col style="width: 100%;" />
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" disabled /></th>
+                                <th>Logic</th>
+                                <th>Rule</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contentForbidTblBdy">
+                        </tbody>
+                    </table>
+                    <button class="w3-btn w3-green" onclick="addContentForbidRow()">Add Row</button>
+                    <button class="w3-btn w3-red" onclick="removeContentForbidRow()">Remove Selected Row(s)</button>
+                </div>
             </section>
 
             <section id="compile" class="w3-container">
