@@ -803,10 +803,7 @@
             <button onclick="show('files')">Files</button><br/>
             <button onclick="show('content')">Content</button><br/>
             <button onclick="show('compile')">Compile</button><br/>
-            Run <select id="runSlt"></select>
-            <button id="loadRunBtn" onclick="loadRun()">Load</button>
-            <button id="dupRunBtn" onclick="duplicateRun()">Duplicate</button><br/>
-            <button onclick="addRun()">Add Test Case</button><br/>
+            <button onclick="show('runs')">Test Cases</button><br/>
             <button id="saveBtn">Save to Downloads</button>
         </nav>
         <div class="w3-container" style="margin-left: 25%">
@@ -928,7 +925,17 @@
             <section id="runs" >
                 <h2>Test Case Editor</h2>
                 <p>Edit how a test case will be run</p>
-                <button id="saveRunBtn" class="w3-btn w3-green" onclick="saveRun()">Save Run</button>
+
+                <div class="w3-panel w3-card-4" style="width: 50%;">
+                    <h4>Test Case</h4>
+                    <select id="runSlt" class="w3-input w3-border" style="margin-bottom: 10px;"></select>
+                    <button id="loadRunBtn" class="w3-btn w3-gray" onclick="loadRun()">Load</button>
+                    <button id="dupRunBtn" class="w3-btn w3-gray" onclick="duplicateRun()">Duplicate</button>
+                    <button class="w3-btn w3-green" onclick="addRun()">New Test Case</button>
+                </div>
+
+                <button id="saveRunBtn" class="w3-btn w3-green" onclick="saveRun()">Save Current Test Case</button>
+
                 <div class="w3-panel w3-card-4" style="width: 50%; padding-bottom: 10px;">
                     <h3>Settings</h3>
                     Name <input id="runName" class="w3-input w3-border" type="text" /><br/>
