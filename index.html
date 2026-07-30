@@ -7,6 +7,94 @@
 
         <script>
             /**
+             * Tests
+             */
+
+            function testAll() {
+                let tests = [
+                    test_buildCheckSelectAndTextRow_default,
+                    test_buildCheckSelectAndTextRow_custom
+                ]
+
+                for (let test of tests) {
+                    let res = test();
+
+                    if (res.errors.length > 0) {
+                        console.error(res.name + " Failed\n" + res.errors.join("\n\t"));
+                    } else {
+                        console.log(res.name + " Passed");
+                    }
+                }
+            }
+
+            function test_buildCheckSelectAndTextRow_default() {
+                errors = [];
+
+                let res = buildCheckSelectAndTextRow(
+                    [{label: "opt1_label", value: "opt1_value"}, {label: "opt2_label", value: "opt2_value"}]
+                );
+
+                if (res.tagName !== "TR") {
+                    errors.push("Returned a " + res.tagName + " instead of a tr");
+                } else {
+                    let checkbox = res.firstChild.firstChild;
+                    if (checkbox.checked) {
+                        errors.push("Checkbox did not default to unchecked");
+                    }
+
+                    let select = res.firstChild.nextElementSibling.firstChild;
+                    if (select.value !== "opt1_value") {
+                        errors.push("Select did not default to first option");
+                    }
+
+                    let opt1 = select.firstChild;
+                    if (opt1.innerHTML !== "opt1_label" && opt1.value !== "opt1_value") {
+                        errors.push("Incorrect label or value for select first option");
+                    }
+
+                    let opt2 = opt1.nextElementSibling;
+                    if (opt2.innerHTML !== "opt2_label" && opt2.value !== "opt2_value") {
+                        errors.push("Incorrect label or value for select second option");
+                    }
+
+                    let textbox = res.firstChild.nextElementSibling.nextElementSibling.firstChild;
+                    if (textbox.type !== "text" && textbox.value !== "") {
+                        errors.push("No empty textbox");
+                    }
+                }
+
+                return {
+                    name: "test_buildCheckSelectAndTextRow_default",
+                    errors: errors
+                };
+            }
+
+            function test_buildCheckSelectAndTextRow_custom() {
+                let errors = [];
+
+                let res = buildCheckSelectAndTextRow(
+                    [{label: "opt1_label", value: "opt1_value"}, {label: "opt2_label", value: "opt2_value"}],
+                    "opt2_value", "Hello, row"
+                );
+
+                let select = res.firstChild.nextElementSibling.firstChild;
+                if (select.value !== "opt2_value") {
+                    errors.push("Custom value not set for select");
+                }
+
+                let textbox = res.firstChild.nextElementSibling.nextElementSibling.firstChild;
+                if (textbox.value !== "Hello, row") {
+                    errors.push('Expected "Hello, row" for textbox value. Got "' + textbox.value + '"" instead.');
+                }
+
+                return {
+                    name: "test_buildCheckSelectAndTextRow_custom",
+                    errors: errors
+                };
+            }
+        </script>
+        <script>
+            /**
              * Extract data from DOM
              */
 
@@ -555,12 +643,7 @@
                 row.appendChild(td);
 
                 // Expected
-                row.appendChild(buildTextCodeCell());
-
-                if (text !== undefined) {
-                    input.value = text;
-                    input.dispatchEvent(new Event("change", {bubbles: true}));
-                }
+                row.appendChild(buildTextCodeCell({expected: text}));
 
                 return row;
             }
@@ -719,6 +802,8 @@
             }
 
             window.addEventListener("load", function () {
+                testAll();
+
                 // Save
                 document.getElementById("saveBtn").addEventListener("click", function() {
                     let rubric = {
