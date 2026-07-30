@@ -843,7 +843,7 @@
 
                     let url = URL.createObjectURL(
                         // From: https://robkendal.co.uk/blog/2020-04-17-saving-text-to-client-side-file-using-vanilla-js/
-                        new Blob([JSON.stringify(rubric)], {type: "text/plain"})
+                        new Blob([JSON.stringify(rubric, null, 4)], {type: "text/plain"})
                     );
                     downloadLink.href = url
                     downloadLink.download = "rubric.json";
