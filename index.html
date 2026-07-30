@@ -297,6 +297,10 @@
                     i++;
                 }
 
+                if (!criterion.endsWithInput) {
+                    criterion.expected += "\n";
+                }
+
                 console.log(criterion);
 
                 return criterion;
@@ -1072,7 +1076,10 @@
 
                 <div class="w3-panel w3-card-4">
                     <h3>Standard Out Criteria</h3>
-                    <p>Give criteria for all lines written to standard out when the test case's command is executed.</p>
+                    <p>
+                        Give criteria for all lines written to standard out when the test case's command is executed.<br/>
+                        <i>Note: Newline characters will sutomatically be placed at the end of lines which have no input.</i>
+                    </p>
                     <table id="runTbl" class="w3-table-all">
                         <colgroup>
                             <col style="width: fit-content; min-width: 15px;"/>
