@@ -615,7 +615,7 @@
                 td.appendChild(document.createElement("code"));
                 td.lastChild.innerHTML = '""'
 
-                if (criterion !== undefined) {
+                if (criterion !== undefined && criterion.expected !== undefined) {
                     input.value = criterion.expected;
                     input.dispatchEvent(new Event("change", {bubbles: true}));
                 }
