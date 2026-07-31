@@ -4,6 +4,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/5/w3.css">
+        <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-indigo.css">
 
         <script>
             /**
@@ -905,8 +906,8 @@
             }
         </style>
     </head>
-    <body>
-        <nav class="w3-sidebar w3-bar-block" style="width: 25%">
+    <body class="w3-theme-l3">
+        <nav class="w3-sidebar w3-bar-block w3-theme" style="width: 25%">
             <input id="filePicker" type="file" accept=".json" /><br/>
             <button onclick="show('files')">Files</button><br/>
             <button onclick="show('content')">Content</button><br/>
@@ -918,9 +919,9 @@
             <section id="files" class="w3-container">
                 <h3>File Checks (Optional)</h3>
                 <p>File system information needed to evaluate a submission</p>
-                <button class="w3-btn w3-green" onclick="extractFileChecks()">Save</button>
+                <button class="w3-button w3-green" onclick="extractFileChecks()">Save</button>
 
-                <div class="w3-panel w3-card-4">
+                <div class="w3-panel w3-card-4 w3-theme">
                     <h4>Requirements</h4>
                     <p>All submitted files must meet the following requirements</p>
                     <table class="w3-table-all">
@@ -930,7 +931,7 @@
                             <col style="width: 100%;" />
                         </colgroup>
                         <thead>
-                            <tr>
+                            <tr class="w3-theme-dark">
                                 <th><input type="checkbox" disabled /></th>
                                 <th>Logic</th>
                                 <th>Rule</th>
@@ -939,11 +940,11 @@
                         <tbody id="filesReqTblBdy">
                         </tbody>
                     </table>
-                    <button class="w3-btn w3-green" onclick="addFilesReqRow()">Add Row</button>
-                    <button class="w3-btn w3-red" onclick="removeFilesReqRow()">Remove Selected Row(s)</button>
+                    <button class="w3-button w3-green" onclick="addFilesReqRow()">Add Row</button>
+                    <button class="w3-button w3-red" onclick="removeFilesReqRow()">Remove Selected Row(s)</button>
                 </div>
 
-                <div class="w3-panel w3-card-4">
+                <div class="w3-panel w3-card-4 w3-theme">
                     <h4>Forrbidden</h4>
                     <p>All submitted files must not match the following patterns</p>
                     <table class="w3-table-all">
@@ -953,7 +954,7 @@
                             <col style="width: 100%;" />
                         </colgroup>
                         <thead>
-                            <tr>
+                            <tr class="w3-theme-dark">
                                 <th><input type="checkbox" disabled /></th>
                                 <th>Logic</th>
                                 <th>Rule</th>
@@ -962,11 +963,11 @@
                         <tbody id="filesForbidTblBdy">
                         </tbody>
                     </table>
-                    <button class="w3-btn w3-green" onclick="addFilesForbidRow()">Add Row</button>
-                    <button class="w3-btn w3-red" onclick="removeFilesForbidRow()">Remove Selected Row(s)</button>
+                    <button class="w3-button w3-green" onclick="addFilesForbidRow()">Add Row</button>
+                    <button class="w3-button w3-red" onclick="removeFilesForbidRow()">Remove Selected Row(s)</button>
                 </div>
 
-                <div class="w3-panel w3-card-4">
+                <div class="w3-panel w3-card-4 w3-theme">
                     <h4>Support</h4>
                     <p>Relative paths for files which will are being provided by the grader instead of in the individual submission.<br/><i>Note: <code>src</code> paths are relative to <code>/autograder/source/</code> while <code>dst</code> paths are relative to <code>/autograder/submission/</code></i></p>
                     <table class="w3-table-all">
@@ -976,7 +977,7 @@
                             <col style="width: 50%;" />
                         </colgroup>
                         <thead>
-                            <tr>
+                            <tr class="w3-theme-dark">
                                 <th><input type="checkbox" disabled /></th>
                                 <th><code>src</code></th>
                                 <th><code>dst</code></th>
@@ -985,17 +986,17 @@
                         <tbody id="filesSupportTblBdy">
                         </tbody>
                     </table>
-                    <button class="w3-btn w3-green" onclick="addFilesSupportRow()">Add Row</button>
-                    <button class="w3-btn w3-red" onclick="removeFilesSupportRow()">Remove Selected Row(s)</button>
+                    <button class="w3-button w3-green" onclick="addFilesSupportRow()">Add Row</button>
+                    <button class="w3-button w3-red" onclick="removeFilesSupportRow()">Remove Selected Row(s)</button>
                 </div>
             </section>
 
             <section id="content" class="w3-container">
                 <h3>File Content (Optional)</h3>
                 <p>Describe criteria for the contents of all files.</p>
-                <button class="w3-btn w3-green" onclick="extractContent()">Save</button>
+                <button class="w3-button w3-green" onclick="extractContent()">Save</button>
 
-                <div class="w3-panel w3-card-4">
+                <div class="w3-panel w3-card-4 w3-theme">
                     <h4>Forrbidden</h4>
                     <p>List regular expressions which describe forbidden content.</p>
                     <table class="w3-table-all">
@@ -1005,7 +1006,7 @@
                             <col style="width: 100%;" />
                         </colgroup>
                         <thead>
-                            <tr>
+                            <tr class="w3-theme-dark">
                                 <th><input type="checkbox" disabled /></th>
                                 <th>Logic</th>
                                 <th>Rule</th>
@@ -1014,37 +1015,37 @@
                         <tbody id="contentForbidTblBdy">
                         </tbody>
                     </table>
-                    <button class="w3-btn w3-green" onclick="addContentForbidRow()">Add Row</button>
-                    <button class="w3-btn w3-red" onclick="removeContentForbidRow()">Remove Selected Row(s)</button>
+                    <button class="w3-button w3-green" onclick="addContentForbidRow()">Add Row</button>
+                    <button class="w3-button w3-red" onclick="removeContentForbidRow()">Remove Selected Row(s)</button>
                 </div>
             </section>
 
             <section id="compile" class="w3-container">
                 <h3>Compile (Optional)</h3>
                 <p>The following command will be executed in the submission directory before any tests are run</p>
-                <button id="compileSaveBtn" class="w3-btn w3-green" onclick="extractCompile()">Save</button>
-                <div class="w3-panel w3-card-4" style="width: 75%; padding-bottom: 10px; padding-top: 10px;">
+                <button id="compileSaveBtn" class="w3-button w3-green" onclick="extractCompile()">Save</button>
+                <div class="w3-panel w3-card-4 w3-theme" style="width: 75%; padding-bottom: 10px; padding-top: 10px;">
                     Command <input id="compileCmd" type="text" class="w3-input w3-border" onchange="updateSiblingCode(this)" /><br/>
                     <code>""</code><br/>
                     Points: <input id="compilePts" type="number" class="w3-input w3-border" /><br/>
                 </div>
             </section>
 
-            <section id="runs" >
+            <section id="runs">
                 <h2>Test Case Editor</h2>
                 <p>Edit how a test case will be run</p>
 
-                <div class="w3-panel w3-card-4" style="width: 50%;">
+                <div class="w3-panel w3-card-4 w3-theme" style="width: 50%;">
                     <h4>Test Case</h4>
                     <select id="runSlt" class="w3-input w3-border" style="margin-bottom: 10px;"></select>
-                    <button id="loadRunBtn" class="w3-btn w3-gray" onclick="loadRun()">Load</button>
-                    <button id="dupRunBtn" class="w3-btn w3-gray" onclick="duplicateRun()">Duplicate</button>
-                    <button class="w3-btn w3-green" onclick="addRun()">New Test Case</button>
+                    <button id="loadRunBtn" class="w3-button w3-theme-action" onclick="loadRun()">Load</button>
+                    <button id="dupRunBtn" class="w3-button w3-green" onclick="duplicateRun()">Duplicate</button>
+                    <button class="w3-button w3-green" onclick="addRun()">New Test Case</button>
                 </div>
 
-                <button id="saveRunBtn" class="w3-btn w3-green" onclick="saveRun()">Save Current Test Case</button>
+                <button id="saveRunBtn" class="w3-button w3-green" onclick="saveRun()">Save Current Test Case</button>
 
-                <div class="w3-panel w3-card-4" style="width: 50%; padding-bottom: 10px;">
+                <div class="w3-panel w3-card-4 w3-theme" style="width: 50%; padding-bottom: 10px;">
                     <h3>Settings</h3>
                     Name <input id="runName" class="w3-input w3-border" type="text" /><br/>
                     Command <input id="runCmd" class="w3-input w3-border" type="text" /><br/>
@@ -1052,7 +1053,7 @@
                     Points <input id="runPts" class="w3-input w3-border" type="number" />
                 </div>
 
-                <div class="w3-panel w3-card-4">
+                <div class="w3-panel w3-card-4 w3-theme">
                     <h3>Events</h3>
                     <p>List shell commands to be executed when evaluating the test case.</p>
                     <table class="w3-table-all">
@@ -1062,7 +1063,7 @@
                             <col style="width: 100%;" />
                         </colgroup>
                         <thead>
-                            <tr>
+                            <tr class="w3-theme-dark">
                                 <th><input type="checkbox" disabled/></th>
                                 <th>Type</th>
                                 <th>Command</th>
@@ -1071,11 +1072,11 @@
                         <tbody id="eventTblBdy">
                         </tbody>
                     </table>
-                    <button class="w3-btn w3-green" onclick="addRunEvent()">Add Event</button>
-                    <button class="w3-btn w3-red" onclick="removeEventRows()">Remove selected row(s)</button>
+                    <button class="w3-button w3-green" onclick="addRunEvent()">Add Event</button>
+                    <button class="w3-button w3-red" onclick="removeEventRows()">Remove selected row(s)</button>
                 </div>
 
-                <div class="w3-panel w3-card-4">
+                <div class="w3-panel w3-card-4 w3-theme">
                     <h3>Standard Out Criteria</h3>
                     <p>
                         Give criteria for all lines written to standard out when the test case's command is executed.<br/>
@@ -1089,7 +1090,7 @@
                             <col style="width: fit-content"/>
                         </colgroup>
                         <thead>
-                            <tr class="w3-brown">
+                            <tr class="w3-theme-dark">
                                 <th><input type="checkbox" disabled/></th>
                                 <th>Requirement</th>
                                 <th>Expected</th>
@@ -1099,8 +1100,8 @@
                         <tbody id="runTblBdy">
                         </tbody>
                     </table>
-                    <button class="w3-btn w3-green" onclick="addLine()">Add Line</button>
-                    <button class="w3-btn w3-red" onclick="removeCriteriaRows()">Delete selected row(s)</button>
+                    <button class="w3-button w3-green" onclick="addLine()">Add Line</button>
+                    <button class="w3-button w3-red" onclick="removeCriteriaRows()">Delete selected row(s)</button>
                 </div>
             </section>
         </div>
