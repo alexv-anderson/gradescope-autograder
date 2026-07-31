@@ -824,6 +824,10 @@
                 }
             }
 
+            function uploadClick() {
+                document.getElementById("filePicker").click();
+            }
+
             window.addEventListener("load", function () {
                 testAll();
 
@@ -852,7 +856,8 @@
                         new Blob([JSON.stringify(rubric, null, 4)], {type: "text/plain"})
                     );
                     downloadLink.href = url
-                    downloadLink.download = "rubric.json";
+                    let rubricName = document.getElementById("rubricName").value;
+                    downloadLink.download = (rubricName === undefined || rubricName.trim().length === 0) ? "rubric.json" : rubricName;
                     downloadLink.style.display = "none";
 
                     document.body.append(downloadLink);
@@ -872,6 +877,10 @@
                 document.getElementById("filePicker").addEventListener("change", function(event) {
                     let file = event.target.files[0];
                     if (!file) return;
+
+                    document.getElementById("rubricName").value = file.name;
+                    document.getElementById("fileUploadBtn").classList.add("hide");
+                    document.getElementById("uploadedMsg").classList.remove("hide");
 
                     const reader = new FileReader();
 
@@ -907,13 +916,26 @@
         </style>
     </head>
     <body class="w3-theme-l3">
-        <nav class="w3-sidebar w3-bar-block w3-theme" style="width: 25%">
-            <input id="filePicker" type="file" accept=".json" /><br/>
-            <button onclick="show('files')">Files</button><br/>
-            <button onclick="show('content')">Content</button><br/>
-            <button onclick="show('compile')">Compile</button><br/>
-            <button onclick="show('runs')">Test Cases</button><br/>
-            <button id="saveBtn">Save to Downloads</button>
+        <nav class="w3-sidebar w3-bar-block w3-container w3-theme" style="width: 25%">
+            <div class="w3-panel w3-theme-l3">
+                <h2>Export/Import</h2>
+                <div class="w3-bar"></div>
+                    <input class="hide" id="filePicker" type="file" accept=".json" />
+                    <button class="w3-button w3-theme-action" id="fileUploadBtn" onclick="uploadClick()">Upload Rubric</button>
+                    <span id="uploadedMsg" class="hide">Refresh page to load another rubric.</span>
+                    <input id="rubricName" type="text" class="w3-input w3-border" />
+                    <button class="w3-button w3-green" id="saveBtn">Save to Downloads</button>
+                </div>
+            </div>
+            <div class="w3-panel w3-card-4 w3-theme-l3">
+                <h2>Configuration</h2>
+                <div class="w3-bar">
+                    <button class="w3-button w3-theme-action" onclick="show('files')">Files</button>
+                    <button class="w3-button w3-theme-action" onclick="show('content')">Content</button>
+                    <button class="w3-button w3-theme-action" onclick="show('compile')">Compile</button>
+                    <button class="w3-button w3-theme-action" onclick="show('runs')">Test Cases</button>
+                </div>
+            </div>
         </nav>
         <div class="w3-container" style="margin-left: 25%">
             <section id="files" class="w3-container">
