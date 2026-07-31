@@ -919,13 +919,12 @@
         <nav class="w3-sidebar w3-bar-block w3-container w3-theme" style="width: 25%">
             <div class="w3-panel w3-theme-l3">
                 <h2>Export/Import</h2>
-                <div class="w3-bar"></div>
-                    <input class="hide" id="filePicker" type="file" accept=".json" />
-                    <button class="w3-button w3-theme-action" id="fileUploadBtn" onclick="uploadClick()">Upload Rubric</button>
-                    <span id="uploadedMsg" class="hide">Refresh page to load another rubric.</span>
-                    <input id="rubricName" type="text" class="w3-input w3-border" />
-                    <button class="w3-button w3-green" id="saveBtn">Save to Downloads</button>
-                </div>
+                <input class="hide" id="filePicker" type="file" accept=".json" />
+                <button class="w3-button w3-theme-action" id="fileUploadBtn" onclick="uploadClick()">Upload Rubric</button>
+                <span id="uploadedMsg" class="hide">Refresh page to load another rubric.</span>
+                <br/>
+                Rubric File Name: <input id="rubricName" type="text" class="w3-input w3-border" />
+                <button class="w3-button w3-green" id="saveBtn">Save to Downloads</button>
             </div>
             <div class="w3-panel w3-card-4 w3-theme-l3">
                 <h2>Configuration</h2>
